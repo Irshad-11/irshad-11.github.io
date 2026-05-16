@@ -4,156 +4,235 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Irshad Hossain | Backend & ML Engineer</title>
-    
-    <!-- Dependencies -->
+
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
 
     <style>
+        :root { --bg: #050505; --border: rgba(255,255,255,0.08); }
+        * { box-sizing: border-box; }
+
         body {
-            background-color: #050505;
+            background-color: var(--bg);
             color: #e2e8f0;
             font-family: 'Plus Jakarta Sans', sans-serif;
             overflow-x: hidden;
-            cursor: none;
         }
+
+        @media (hover: hover) and (pointer: fine) { body { cursor: none; } }
 
         .mono { font-family: 'JetBrains Mono', monospace; }
 
-        /* Custom Cursor */
-        #cursor-ring {
+        /* ── CURSOR DOT ── */
+        #cursor-dot {
             position: fixed;
-            width: 40px;
-            height: 40px;
-            border: 1px solid rgba(255, 255, 255, 0.5);
+            width: 8px; height: 8px;
+            background: #fff;
             border-radius: 50%;
             pointer-events: none;
-            z-index: 9999;
-            transition: transform 0.15s ease-out, width 0.3s, height 0.3s, background 0.3s;
+            z-index: 99999;
+            transform: translate(-50%, -50%);
+            transition: width .2s, height .2s, background .2s;
+            display: none;
+        }
+        @media (hover: hover) and (pointer: fine) { #cursor-dot { display: block; } }
+        #cursor-dot.hovering { width: 14px; height: 14px; background: #a78bfa; }
+
+        /* Trail particles */
+        .trail-dot {
+            position: fixed;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 99998;
             transform: translate(-50%, -50%);
         }
 
-        .cursor-hover #cursor-ring {
-            width: 60px;
-            height: 60px;
-            background: rgba(255, 255, 255, 0.1);
-            border-color: #fff;
-        }
-
-        /* Glassmorphism Classes */
+        /* ── GLASS ── */
         .glass {
-            background: rgba(15, 15, 15, 0.7);
+            background: rgba(15,15,15,0.7);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--border);
         }
 
-        /* 3D Background Canvas */
-        #bg-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: -1;
+        /* ── CSS BG (mobile/tablet) ── */
+        #bg-static {
+            position: fixed; inset: 0; z-index: -1;
+            background:
+                radial-gradient(ellipse 80% 50% at 10% 20%, rgba(255,255,255,0.02) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 60% at 90% 80%, rgba(255,255,255,0.015) 0%, transparent 60%);
+            overflow: hidden;
+        }
+        #bg-static::before {
+            content: '';
+            position: absolute; inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
+            -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
+            animation: gridFloat 20s ease-in-out infinite;
+        }
+        @keyframes gridFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-20px)} }
+
+        #bg-canvas { display:none; position:fixed; top:0; left:0; z-index:-1; }
+        @media (hover:hover) and (pointer:fine) and (min-width:1024px) {
+            #bg-canvas  { display:block; }
+            #bg-static  { display:none;  }
         }
 
-        /* Muted / Coming Soon State */
-        .coming-soon-wrapper {
-            filter: grayscale(100%);
-            opacity: 0.4;
-            pointer-events: none;
-            position: relative;
-        }
-
+        /* ── COMING SOON ── */
+        .coming-soon-wrapper { filter:grayscale(100%); opacity:.35; pointer-events:none; }
         .skeleton-pulse {
-            background: linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%);
+            background: linear-gradient(90deg,#1a1a1a 25%,#252525 50%,#1a1a1a 75%);
             background-size: 200% 100%;
             animation: pulse 2s infinite;
         }
+        @keyframes pulse { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+        ::-webkit-scrollbar { width:0; background:transparent; }
 
-        @keyframes pulse {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
+        /* ────────────────────────────────────────
+           SKILL GRID
+           Uniform flat grid — zero col/row spans.
+           8 cols desktop · 6 tablet · 4 mobile
+        ──────────────────────────────────────── */
+        .skill-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            border-top:  1px solid var(--border);
+            border-left: 1px solid var(--border);
         }
+        @media (max-width:1023px) { .skill-grid { grid-template-columns: repeat(6, 1fr); } }
+        @media (max-width:639px)  { .skill-grid { grid-template-columns: repeat(4, 1fr); } }
 
-        /* Hide scrollbar */
-        ::-webkit-scrollbar { width: 0px; background: transparent; }
+        .skill-cell {
+            display: flex; align-items: center; justify-content: center;
+            aspect-ratio: 1 / 1;
+            background: rgba(15,15,15,0.7);
+            border-bottom: 1px solid var(--border);
+            border-right:  1px solid var(--border);
+            padding: 6px;
+            transition: background .25s;
+        }
+        .skill-cell:hover { background: rgba(255,255,255,0.05); }
 
         .skill-icon {
+            font-size: clamp(1.1rem, 2.5vw, 1.75rem);
             filter: grayscale(100%);
-            transition: all 0.4s ease;
+            transition: filter .3s, transform .3s;
+            display: block;
         }
-        .skill-icon:hover {
-            filter: grayscale(0%);
-            transform: translateY(-5px);
+        @media (hover:hover) {
+            .skill-cell:hover .skill-icon { filter:grayscale(0%); transform:translateY(-3px); }
         }
+        .skill-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: clamp(6px, 1.2vw, 10px);
+            font-weight: 700;
+            color: #52525b;
+            text-align: center;
+            letter-spacing: .02em;
+            line-height: 1.3;
+            transition: color .25s;
+        }
+        .skill-cell:hover .skill-label { color: #a1a1aa; }
+
+        /* ── HERO HEADLINE ── */
+        .hero-headline {
+            font-size: clamp(2.8rem, 9vw, 6rem);
+            line-height: .92; font-weight: 800; letter-spacing: -.04em;
+        }
+
+        /* ── PROJECT CARDS ── */
+        .project-card { transition: transform .4s ease, box-shadow .4s ease; }
+        @media (hover:hover) {
+            .project-card:hover { transform:translateY(-6px); box-shadow:0 20px 40px rgba(0,0,0,.4); }
+            .project-card:hover .card-links { opacity:1; }
+            .project-card:hover .card-title { color:#fff; }
+        }
+        .card-links { opacity:0; transition:opacity .3s; }
+
+        /* ── MISC ── */
+        @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+        .bounce { animation: bounce 2s ease-in-out infinite; }
+
+        @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+        .fade-up   { animation: fadeUp .7s ease both; }
+        .fade-up-2 { animation: fadeUp .7s .15s ease both; }
+        .fade-up-3 { animation: fadeUp .7s .3s ease both; }
+
+        #main-nav { transition: top .4s ease, bottom .4s ease, padding .4s ease; }
     </style>
 </head>
 <body class="selection:bg-white/20">
 
-    <div id="cursor-ring"></div>
+    <div id="cursor-dot"></div>
     <canvas id="bg-canvas"></canvas>
+    <div id="bg-static"></div>
 
     <!-- Navigation -->
-    <nav id="main-nav" class="fixed top-0 left-0 w-full z-50 p-6 transition-all duration-500 ease-in-out">
-        <div id="nav-container" class="max-w-6xl mx-auto glass rounded-2xl px-8 py-4 flex justify-between items-center transition-all duration-500 ease-in-out">
-            <div id="nav-logo" class="text-xl font-extrabold tracking-tighter transition-all duration-300 whitespace-nowrap">I.HOSSAIN<span class="text-white/40">_</span></div>
-            <div id="nav-links" class="hidden lg:flex space-x-6 text-xs font-semibold uppercase tracking-widest text-zinc-400 transition-all duration-300">
-                <a href="#skills" class="hover:text-white transition-colors">Skills</a>
+    <nav id="main-nav" class="fixed top-0 left-0 w-full z-50 p-3 sm:p-6">
+        <div id="nav-container" class="max-w-6xl mx-auto glass rounded-2xl px-4 sm:px-8 py-3 sm:py-4 flex justify-between items-center">
+            <div class="text-base sm:text-xl font-extrabold tracking-tighter whitespace-nowrap">I.HOSSAIN<span class="text-white/40">_</span></div>
+            <div class="hidden md:flex space-x-4 lg:space-x-6 text-[10px] font-semibold uppercase tracking-widest text-zinc-400">
+                <a href="#skills"   class="hover:text-white transition-colors">Skills</a>
                 <a href="#projects" class="hover:text-white transition-colors">Projects</a>
                 <a href="#research" class="hover:text-white transition-colors">Research</a>
-                <a href="#contact" class="hover:text-white transition-colors">Contact</a>
+                <a href="#contact"  class="hover:text-white transition-colors">Contact</a>
             </div>
-            <a id="nav-btn" href="mailto:email@example.com" class="text-xs px-4 py-2 bg-white text-black font-bold rounded-lg hover:scale-105 transition-transform whitespace-nowrap">Contact ME</a>
+            <a href="mailto:email@example.com" class="text-[10px] sm:text-xs px-3 sm:px-4 py-2 bg-white text-black font-bold rounded-lg hover:scale-105 transition-transform whitespace-nowrap">Contact ME</a>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <header class="min-h-screen flex items-center pt-20 px-10 max-w-7xl mx-auto">
-        <div class="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-                <div class="inline-block px-3 py-1 mb-3 border border-white/20 rounded-full text-[10px] mono uppercase tracking-widest text-zinc-400">
+    <!-- Hero -->
+    <header class="min-h-screen flex items-center pt-24 sm:pt-28 pb-16 px-4 sm:px-8 lg:px-10 max-w-7xl mx-auto">
+        <div class="grid lg:grid-cols-2 gap-10 lg:gap-12 items-center w-full">
+            <div class="fade-up">
+                <div class="inline-block px-3 py-1 mb-4 border border-white/20 rounded-full text-[10px] mono uppercase tracking-widest text-zinc-400">
                     Software Engineering Student
                 </div>
-                <h1 class="text-6xl lg:text-8xl font-extrabold mb-6 tracking-tighter leading-[0.9]">
-    Machine <br>
-    <span class="text-zinc-600 font-light tracking-tight">Learning</span>
-</h1>
-<p class="text-zinc-400 text-lg mb-10 max-w-md leading-relaxed border-l-2 border-white/10 pl-6">
-    I love exploring how things work. For me, nothing beats the satisfaction of researching a problem and building a custom tool to fix it. 
-    I specialize in <span class="text-zinc-200">CS Fundamentals, System Architecture, and DBMS</span>. 
-    <span class="block mt-4 text-sm mono text-zinc-500 italic">Dropping the full version here soon.</span>
-</p>
-                <div class="flex items-center gap-6">
-                    <a href="https://github.com/Irshad-11" target="_blank" rel="noopener noreferrer" class="inline-block">
-    <button id="magnetic-btn" class="px-8 py-4 bg-white text-black font-bold rounded-xl transition-all hover:shadow-[0_0_30px_rgba(255,255,255,0.3)]">
-        Explore My Work
-    </button>
-</a>
-                    <div class="flex gap-4 text-xl text-zinc-500">
-                        <a href="https://github.com/Irshad-11" class="hover:text-white transition-colors"><i class="fab fa-github"></i></a>
-                        <a href="https://www.linkedin.com/in/irshad-hossain-785548323/" class="hover:text-white transition-colors"><i class="fab fa-linkedin"></i></a>
+                <h1 class="hero-headline mb-6">
+                    Machine <br>
+                    <span class="text-zinc-600 font-light tracking-tight">Learning</span>
+                </h1>
+                <p class="text-zinc-400 text-sm sm:text-base lg:text-lg mb-8 max-w-md leading-relaxed border-l-2 border-white/10 pl-5">
+                    I love exploring how things work — nothing beats researching a problem and building a custom tool to fix it.
+                    I specialize in <span class="text-zinc-200">CS Fundamentals, System Architecture, and DBMS</span>.
+                    <span class="block mt-3 text-xs mono text-zinc-500 italic">Full version dropping soon.</span>
+                </p>
+                <div class="flex flex-wrap items-center gap-4 sm:gap-6">
+                    <a href="https://github.com/Irshad-11" target="_blank" rel="noopener noreferrer">
+                        <button id="magnetic-btn" class="px-6 sm:px-8 py-3 sm:py-4 bg-white text-black text-sm font-bold rounded-xl transition-all hover:shadow-[0_0_30px_rgba(255,255,255,0.25)] active:scale-95">
+                            Explore My Work
+                        </button>
+                    </a>
+                    <div class="flex gap-4 text-lg sm:text-xl text-zinc-500">
+                        <a href="https://github.com/Irshad-11" class="hover:text-white transition-colors p-1" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                        <a href="https://www.linkedin.com/in/irshad-hossain-785548323/" class="hover:text-white transition-colors p-1" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
                     </div>
                 </div>
             </div>
-            <div class="hidden lg:block">
+
+            <!-- Desktop hero card -->
+            <div class="hidden lg:block fade-up-2">
                 <div class="glass p-8 rounded-[2rem] relative group rotate-3 hover:rotate-0 transition-transform duration-700">
-                    <div class="absolute -top-4 -left-4 w-24 h-24 bg-white/10 blur-3xl rounded-full"></div>
+                    <div class="absolute -top-4 -left-4 w-24 h-24 bg-white/10 blur-3xl rounded-full pointer-events-none"></div>
                     <div class="flex items-center gap-4 mb-8">
-                        <div class="w-12 h-12 rounded-full bg-zinc-800 flex items-center justify-center font-bold text-xl">IH</div>
+                        <div class="w-12 h-12 rounded-full bg-zinc-800 flex items-center justify-center font-bold text-xl flex-shrink-0">IH</div>
                         <div>
                             <h3 class="font-bold">Irshad Hossain</h3>
-                            <p class="text-xs text-zinc-500 uppercase tracking-widest">May 15, 2026</p>
+                            <p class="text-xs text-zinc-500 uppercase tracking-widest">May 2026</p>
                         </div>
                     </div>
-                    <div class="space-y-4">
+                    <div class="space-y-3 mb-8">
                         <div class="h-2 w-full bg-white/5 rounded"></div>
                         <div class="h-2 w-4/5 bg-white/5 rounded"></div>
                         <div class="h-2 w-2/3 bg-white/5 rounded"></div>
                     </div>
-                    <div class="mt-10 grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-2 gap-4">
                         <div class="p-4 bg-white/5 rounded-xl border border-white/10">
                             <p class="text-[10px] text-zinc-500 uppercase mb-1">Focus</p>
                             <p class="text-sm font-bold">Backend + ML</p>
@@ -165,382 +244,475 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Mobile mini card -->
+            <div class="lg:hidden fade-up-3">
+                <div class="glass p-4 rounded-2xl flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center font-bold flex-shrink-0">IH</div>
+                    <div class="flex-1 min-w-0">
+                        <p class="font-bold text-sm">Irshad Hossain</p>
+                        <p class="text-[10px] text-zinc-500 mono uppercase tracking-wider">Backend + ML</p>
+                    </div>
+                    <span class="text-[10px] font-bold text-green-400 bg-green-400/10 px-2 py-1 rounded-full whitespace-nowrap">Available</span>
+                </div>
+            </div>
         </div>
     </header>
 
-    <!-- Skills Section -->
-    <section id="skills" class="py-24 px-4 sm:px-10 max-w-7xl mx-auto">
-        <div class="mb-12">
-            <h2 class="text-xs font-bold uppercase tracking-[0.3em] text-zinc-500 mb-2">Expertise Stack</h2>
-            <p class="text-xl font-bold tracking-tight text-zinc-300">A granular layout of my tools and tech stack.</p>
+    <!-- Skills -->
+    <section id="skills" class="py-16 sm:py-24 px-4 sm:px-8 lg:px-10 max-w-7xl mx-auto">
+        <div class="mb-8 sm:mb-12">
+            <h2 class="text-[10px] sm:text-xs font-bold uppercase tracking-[0.3em] text-zinc-500 mb-2">Expertise Stack</h2>
+            <p class="text-base sm:text-xl font-bold tracking-tight text-zinc-300">My tools and tech stack.</p>
         </div>
-        
-        <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-0 auto-rows-[60px] sm:auto-rows-[90px] grid-flow-dense border-t border-l border-white/10">
-            
-            <div class="glass p-1 sm:p-4 rounded-none border-b border-r border-white/10 flex items-center justify-center col-span-1 row-span-1"><i class="devicon-html5-plain text-xl sm:text-3xl skill-icon" title="HTML5"></i></div>
-            <div class="glass p-1 sm:p-4 rounded-none border-b border-r border-white/10 flex items-center justify-center col-span-1 row-span-1"><i class="devicon-css3-plain text-xl sm:text-3xl skill-icon" title="CSS3"></i></div>
-            
-            <div class="glass p-1 sm:p-4 rounded-none border-b border-r border-white/10 flex items-center justify-center col-span-1 row-span-1 sm:row-span-2"><i class="devicon-javascript-plain text-xl sm:text-3xl skill-icon" title="JavaScript"></i></div>
-            
-            <div class="glass p-1 sm:p-4 rounded-none border-b border-r border-white/10 flex items-center justify-center col-span-1 row-span-1"><i class="devicon-typescript-plain text-xl sm:text-3xl skill-icon" title="TypeScript"></i></div>
-            <div class="glass p-1 sm:p-4 rounded-none border-b border-r border-white/10 flex items-center justify-center col-span-1 row-span-1"><i class="devicon-react-original text-xl sm:text-3xl skill-icon" title="React.js"></i></div>
-            
-            <div class="glass p-1 sm:p-4 rounded-none border-b border-r border-white/10 flex items-center justify-center col-span-1 sm:col-span-2 row-span-1 sm:row-span-2"><i class="devicon-tailwindcss-original text-xl sm:text-3xl skill-icon" title="Tailwind CSS"></i></div>
-            <div class="glass p-1 sm:p-4 rounded-none border-b border-r border-white/10 flex items-center justify-center col-span-1 row-span-1"><i class="devicon-bootstrap-plain text-xl sm:text-3xl skill-icon" title="Bootstrap"></i></div>
 
-            <div class="glass p-1 sm:p-4 rounded-none border-b border-r border-white/10 flex items-center justify-center col-span-1 row-span-1"><i class="devicon-python-plain text-xl sm:text-3xl skill-icon" title="Python"></i></div>
-            <div class="glass p-1 sm:p-4 rounded-none border-b border-r border-white/10 flex items-center justify-center col-span-1 row-span-1"><i class="devicon-django-plain text-xl sm:text-3xl skill-icon" title="Django"></i></div>
-            <div class="glass p-1 sm:p-4 rounded-none border-b border-r border-white/10 flex items-center justify-center col-span-1 row-span-1"><i class="devicon-fastapi-plain text-xl sm:text-3xl skill-icon" title="FastAPI"></i></div>
-            
-            <div class="glass p-1 sm:p-4 rounded-none border-b border-r border-white/10 flex items-center justify-center col-span-1 row-span-1 sm:row-span-2"><i class="devicon-flask-original text-xl sm:text-3xl skill-icon" title="Flask"></i></div>
-            <div class="glass p-1 sm:p-4 rounded-none border-b border-r border-white/10 flex items-center justify-center col-span-1 text-center text-[10px] sm:text-xs mono font-bold text-zinc-500 hover:text-orange-400 transition-colors cursor-default" title="REST APIs">REST APIs</div>
-            <div class="glass p-1 sm:p-4 rounded-none border-b border-r border-white/10 flex items-center justify-center col-span-1 text-center text-[10px] sm:text-xs mono font-bold text-zinc-500 hover:text-indigo-400 transition-colors cursor-default" title="Microservices">Micro</div>
+        <!--
+            UNIFORM FLAT GRID — no row/col spans ever.
+            7 full rows × 8 cols = 56 cells. All filled.
+        -->
+        <div class="skill-grid">
 
-            <div class="glass p-1 sm:p-4 rounded-none border-b border-r border-white/10 flex items-center justify-center col-span-1 row-span-1"><i class="devicon-postgresql-plain text-xl sm:text-3xl skill-icon" title="PostgreSQL"></i></div>
-            <div class="glass p-1 sm:p-4 rounded-none border-b border-r border-white/10 flex items-center justify-center col-span-1 row-span-1"><i class="devicon-mysql-plain text-xl sm:text-3xl skill-icon" title="MySQL"></i></div>
-            <div class="glass p-1 sm:p-4 rounded-none border-b border-r border-white/10 flex items-center justify-center col-span-1 row-span-1"><i class="devicon-sqlite-plain text-xl sm:text-3xl skill-icon" title="SQLite"></i></div>
-            <div class="glass p-1 sm:p-4 rounded-none border-b border-r border-white/10 flex items-center justify-center col-span-1 row-span-1"><i class="devicon-mongodb-plain text-xl sm:text-3xl skill-icon" title="MongoDB"></i></div>
-            
-            <div class="glass p-1 sm:p-4 rounded-none border-b border-r border-white/10 flex items-center justify-center col-span-1 row-span-1 sm:row-span-2"><i class="devicon-redis-plain text-xl sm:text-3xl skill-icon" title="Redis"></i></div>
-            <div class="glass p-1 sm:p-4 rounded-none border-b border-r border-white/10 flex items-center justify-center col-span-1 row-span-1"><i class="devicon-firebase-plain text-xl sm:text-3xl skill-icon" title="Firebase Firestore"></i></div>
-            <div class="glass p-1 sm:p-4 rounded-none border-b border-r border-white/10 flex items-center justify-center col-span-1 row-span-1"><i class="devicon-docker-plain text-xl sm:text-3xl skill-icon" title="Docker"></i></div>
+            <!-- ── ROW 1: Languages & Frontend ── -->
+            <div class="skill-cell"><i class="devicon-html5-plain skill-icon" title="HTML5"></i></div>
+            <div class="skill-cell"><i class="devicon-css3-plain skill-icon" title="CSS3"></i></div>
+            <div class="skill-cell"><i class="devicon-javascript-plain skill-icon" title="JavaScript"></i></div>
+            <div class="skill-cell"><i class="devicon-typescript-plain skill-icon" title="TypeScript"></i></div>
+            <div class="skill-cell"><i class="devicon-react-original skill-icon" title="React.js"></i></div>
+            <div class="skill-cell"><i class="devicon-tailwindcss-original skill-icon" title="Tailwind CSS"></i></div>
+            <div class="skill-cell"><i class="devicon-bootstrap-plain skill-icon" title="Bootstrap"></i></div>
+            <div class="skill-cell"><i class="devicon-vite-plain skill-icon" title="Vite"></i></div>
 
-            <div class="glass p-1 sm:p-4 rounded-none border-b border-r border-white/10 flex items-center justify-center col-span-1 row-span-1"><i class="devicon-githubactions-plain text-xl sm:text-3xl skill-icon" title="GitHub Actions"></i></div>
-            <div class="glass p-1 sm:p-4 rounded-none border-b border-r border-white/10 flex items-center justify-center col-span-1 row-span-1"><i class="devicon-amazonwebservices-plain-wordmark text-xl sm:text-3xl skill-icon" title="AWS"></i></div>
-            <div class="glass p-1 sm:p-4 rounded-none border-b border-r border-white/10 flex items-center justify-center col-span-1 row-span-1"><i class="devicon-googlecloud-plain text-xl sm:text-3xl skill-icon" title="GCP"></i></div>
-            
-            <div class="glass p-1 sm:p-4 rounded-none border-b border-r border-white/10 flex items-center justify-center col-span-1 row-span-1 sm:row-span-2"><i class="devicon-azure-plain text-xl sm:text-3xl skill-icon" title="Azure"></i></div>
-            <div class="glass p-1 sm:p-4 rounded-none border-b border-r border-white/10 flex items-center justify-center col-span-1 row-span-1"><i class="devicon-vercel-line text-xl sm:text-3xl skill-icon" title="Vercel"></i></div>
-            <div class="glass p-1 sm:p-4 rounded-none border-b border-r border-white/10 flex items-center justify-center col-span-1 row-span-1"><i class="devicon-netlify-plain text-xl sm:text-3xl skill-icon" title="Netlify"></i></div>
-            <div class="glass p-1 sm:p-4 rounded-none border-b border-r border-white/10 flex items-center justify-center col-span-1 text-center text-[10px] sm:text-xs mono font-bold text-zinc-500 hover:text-emerald-400 transition-colors cursor-default" title="Render">Render</div>
+            <!-- ── ROW 2: Backend Frameworks ── -->
+            <div class="skill-cell"><i class="devicon-python-plain skill-icon" title="Python"></i></div>
+            <div class="skill-cell"><i class="devicon-django-plain skill-icon" title="Django"></i></div>
+            <div class="skill-cell"><i class="devicon-fastapi-plain skill-icon" title="FastAPI"></i></div>
+            <div class="skill-cell"><i class="devicon-flask-original skill-icon" title="Flask"></i></div>
+            <div class="skill-cell"><span class="skill-label">REST<br>APIs</span></div>
+            <div class="skill-cell"><span class="skill-label">Micro<br>services</span></div>
+            <div class="skill-cell"><span class="skill-label">Web<br>Sockets</span></div>
+            <div class="skill-cell"><span class="skill-label">Graph<br>QL</span></div>
 
-            <div class="glass p-1 sm:p-4 rounded-none border-b border-r border-white/10 flex items-center justify-center col-span-1 text-center text-[10px] sm:text-xs mono font-bold text-zinc-500 hover:text-red-400 transition-colors cursor-default" title="PyTest">PyTest</div>
-            <div class="glass p-1 sm:p-4 rounded-none border-b border-r border-white/10 flex items-center justify-center col-span-1 text-center text-[10px] sm:text-xs mono font-bold text-zinc-500 hover:text-orange-500 transition-colors cursor-default" title="Postman">Postman</div>
-            
-            <div class="glass p-1 sm:p-4 rounded-none border-b border-r border-white/10 flex items-center justify-center col-span-1 sm:col-span-2 row-span-1 sm:row-span-2"><i class="devicon-vite-plain text-xl sm:text-3xl skill-icon" title="Vite"></i></div>
-            <div class="glass p-1 sm:p-4 rounded-none border-b border-r border-white/10 flex items-center justify-center col-span-1 text-center text-[10px] sm:text-xs mono font-bold text-zinc-500 hover:text-amber-500 transition-colors cursor-default" title="Esbuild">Esbuild</div>
-            <div class="glass p-1 sm:p-4 rounded-none border-b border-r border-white/10 flex items-center justify-center col-span-1"><i class="devicon-eslint-plain text-xl sm:text-3xl skill-icon" title="ESLint"></i></div>
-            <div class="glass p-1 sm:p-4 rounded-none border-b border-r border-white/10 flex items-center justify-center col-span-1 text-center text-[10px] sm:text-xs mono font-bold text-zinc-500 hover:text-pink-400 transition-colors cursor-default" title="Prettier">Prettier</div>
-            
-            <div class="glass p-1 sm:p-4 rounded-none border-b border-r border-white/10 flex items-center justify-center col-span-1 row-span-1"><i class="devicon-vscode-plain text-xl sm:text-3xl skill-icon" title="VS Code"></i></div>
-            <div class="glass p-1 sm:p-4 rounded-none border-b border-r border-white/10 flex items-center justify-center col-span-1 text-center text-[10px] sm:text-xs mono font-bold text-zinc-500 hover:text-white transition-colors cursor-default" title="GitHub Issues">Issues</div>
-            <div class="glass p-1 sm:p-4 rounded-none border-b border-r border-white/10 flex items-center justify-center col-span-1 row-span-1"><i class="devicon-figma-plain text-xl sm:text-3xl skill-icon" title="Figma"></i></div>
-            <div class="glass p-1 sm:p-4 rounded-none border-b border-r border-white/10 flex items-center justify-center col-span-1 row-span-1"><i class="devicon-notion-plain text-xl sm:text-3xl skill-icon" title="Notion"></i></div>
+            <!-- ── ROW 3: Databases & Storage ── -->
+            <div class="skill-cell"><i class="devicon-postgresql-plain skill-icon" title="PostgreSQL"></i></div>
+            <div class="skill-cell"><i class="devicon-mysql-plain skill-icon" title="MySQL"></i></div>
+            <div class="skill-cell"><i class="devicon-sqlite-plain skill-icon" title="SQLite"></i></div>
+            <div class="skill-cell"><i class="devicon-mongodb-plain skill-icon" title="MongoDB"></i></div>
+            <div class="skill-cell"><i class="devicon-redis-plain skill-icon" title="Redis"></i></div>
+            <div class="skill-cell"><i class="devicon-firebase-plain skill-icon" title="Firebase"></i></div>
+            <div class="skill-cell"><span class="skill-label">Chroma<br>DB</span></div>
+            <div class="skill-cell"><span class="skill-label">Vector<br>DB</span></div>
 
-            <div class="glass p-1 sm:p-4 rounded-none border-b border-r border-white/10 flex items-center justify-center col-span-1 row-span-1 sm:row-span-2"><i class="devicon-pytorch-original text-xl sm:text-3xl skill-icon" title="PyTorch"></i></div>
-            <div class="glass p-1 sm:p-4 rounded-none border-b border-r border-white/10 flex items-center justify-center col-span-1 row-span-1"><i class="devicon-tensorflow-original text-xl sm:text-3xl skill-icon" title="TensorFlow"></i></div>
-            <div class="glass p-1 sm:p-4 rounded-none border-b border-r border-white/10 flex items-center justify-center col-span-1 row-span-1"><i class="devicon-scikitlearn-plain text-xl sm:text-3xl skill-icon" title="Scikit-learn"></i></div>
-            <div class="glass p-1 sm:p-4 rounded-none border-b border-r border-white/10 flex items-center justify-center col-span-1 row-span-1"><i class="devicon-numpy-plain text-xl sm:text-3xl skill-icon" title="NumPy"></i></div>
-            <div class="glass p-1 sm:p-4 rounded-none border-b border-r border-white/10 flex items-center justify-center col-span-1 text-center text-[10px] sm:text-xs mono font-bold text-zinc-500 hover:text-blue-300 transition-colors cursor-default" title="SciPy">SciPy</div>
-            <div class="glass p-1 sm:p-4 rounded-none border-b border-r border-white/10 flex items-center justify-center col-span-1 row-span-1"><i class="devicon-pandas-plain text-xl sm:text-3xl skill-icon" title="Pandas"></i></div>
+            <!-- ── ROW 4: DevOps & Cloud ── -->
+            <div class="skill-cell"><i class="devicon-docker-plain skill-icon" title="Docker"></i></div>
+            <div class="skill-cell"><i class="devicon-githubactions-plain skill-icon" title="GitHub Actions"></i></div>
+            <div class="skill-cell"><i class="devicon-amazonwebservices-plain-wordmark skill-icon" title="AWS"></i></div>
+            <div class="skill-cell"><i class="devicon-googlecloud-plain skill-icon" title="GCP"></i></div>
+            <div class="skill-cell"><i class="devicon-azure-plain skill-icon" title="Azure"></i></div>
+            <div class="skill-cell"><i class="devicon-vercel-line skill-icon" title="Vercel"></i></div>
+            <div class="skill-cell"><i class="devicon-netlify-plain skill-icon" title="Netlify"></i></div>
+            <div class="skill-cell"><span class="skill-label">Render</span></div>
 
-            <div class="glass p-1 sm:p-4 rounded-none border-b border-r border-white/10 flex items-center justify-center col-span-1 text-center text-[10px] sm:text-xs mono font-bold text-zinc-500 hover:text-amber-400 transition-colors cursor-default" title="Hugging Face">HF</div>
-            <div class="glass p-1 sm:p-4 rounded-none border-b border-r border-white/10 flex items-center justify-center col-span-1 text-center text-[10px] sm:text-xs mono font-bold text-zinc-500 hover:text-emerald-500 transition-colors cursor-default" title="LangChain">Lang</div>
-            <div class="glass p-1 sm:p-4 rounded-none border-b border-r border-white/10 flex items-center justify-center col-span-1 text-center text-[10px] sm:text-xs mono font-bold text-zinc-500 hover:text-orange-400 transition-colors cursor-default" title="Ollama">Ollama</div>
-            <div class="glass p-1 sm:p-4 rounded-none border-b border-r border-white/10 flex items-center justify-center col-span-1 text-center text-[10px] sm:text-xs mono font-bold text-zinc-500 hover:text-red-500 transition-colors cursor-default" title="OpenCV">CV</div>
-            <div class="glass p-1 sm:p-4 rounded-none border-b border-r border-white/10 flex items-center justify-center col-span-1 text-center text-[10px] sm:text-xs mono font-bold text-zinc-500 hover:text-yellow-500 transition-colors cursor-default" title="Chroma DB">Chroma</div>
+            <!-- ── ROW 5: Dev Tools ── -->
+            <div class="skill-cell"><i class="devicon-figma-plain skill-icon" title="Figma"></i></div>
+            <div class="skill-cell"><i class="devicon-vscode-plain skill-icon" title="VS Code"></i></div>
+            <div class="skill-cell"><i class="devicon-notion-plain skill-icon" title="Notion"></i></div>
+            <div class="skill-cell"><i class="devicon-eslint-plain skill-icon" title="ESLint"></i></div>
+            <div class="skill-cell"><span class="skill-label">Prettier</span></div>
+            <div class="skill-cell"><span class="skill-label">Postman</span></div>
+            <div class="skill-cell"><span class="skill-label">PyTest</span></div>
+            <div class="skill-cell"><span class="skill-label">Esbuild</span></div>
+
+            <!-- ── ROW 6: ML / Data Science ── -->
+            <div class="skill-cell"><i class="devicon-pytorch-original skill-icon" title="PyTorch"></i></div>
+            <div class="skill-cell"><i class="devicon-tensorflow-original skill-icon" title="TensorFlow"></i></div>
+            <div class="skill-cell"><i class="devicon-scikitlearn-plain skill-icon" title="Scikit-learn"></i></div>
+            <div class="skill-cell"><i class="devicon-numpy-plain skill-icon" title="NumPy"></i></div>
+            <div class="skill-cell"><i class="devicon-pandas-plain skill-icon" title="Pandas"></i></div>
+            <div class="skill-cell"><i class="devicon-opencv-plain skill-icon" title="OpenCV"></i></div>
+            <div class="skill-cell"><span class="skill-label">SciPy</span></div>
+            <div class="skill-cell"><span class="skill-label">Matplotlib</span></div>
+
+            <!-- ── ROW 7: LLM & AI Tooling ── -->
+            <div class="skill-cell"><span class="skill-label">Hugging<br>Face</span></div>
+            <div class="skill-cell"><span class="skill-label">Lang<br>Chain</span></div>
+            <div class="skill-cell"><span class="skill-label">Ollama</span></div>
+            <div class="skill-cell"><span class="skill-label">NLLB<br>200</span></div>
+            <div class="skill-cell"><span class="skill-label">Semantic<br>Search</span></div>
+            <div class="skill-cell"><span class="skill-label">RAG</span></div>
+            <div class="skill-cell"><span class="skill-label">OCR</span></div>
+            <div class="skill-cell"><span class="skill-label">Fine<br>Tuning</span></div>
 
         </div>
     </section>
 
-    <!-- Featured Projects -->
-    <section id="projects" class="py-32 px-10 max-w-7xl mx-auto">
-        <div class="flex justify-between items-end mb-16">
-            <h2 class="text-4xl font-extrabold tracking-tighter">Selected Works</h2>
-            <p class="text-zinc-500 mono text-sm underline underline-offset-8">View All Repositories</p>
+    <!-- Projects -->
+    <section id="projects" class="py-16 sm:py-24 lg:py-32 px-4 sm:px-8 lg:px-10 max-w-7xl mx-auto">
+        <div class="flex flex-wrap justify-between items-end gap-4 mb-10 sm:mb-16">
+            <h2 class="text-2xl sm:text-4xl font-extrabold tracking-tighter">Selected Works</h2>
+            <a href="https://github.com/Irshad-11" target="_blank" rel="noopener noreferrer" class="text-zinc-500 mono text-xs sm:text-sm underline underline-offset-8 hover:text-white transition-colors">View All Repos →</a>
         </div>
 
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <!-- Project 1 -->
-            <div class="group relative glass p-6 rounded-3xl overflow-hidden transition-all duration-500 hover:-translate-y-2">
-                <div class="absolute top-4 right-4 z-10 flex gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <a href="https://github.com/Irshad-11/Onubad.ai" class="w-8 h-8 rounded-full glass flex items-center justify-center text-xs hover:bg-white hover:text-black transition-colors"><i class="fab fa-github"></i></a>
-                    <!-- <a href="#" class="w-8 h-8 rounded-full glass flex items-center justify-center text-xs hover:bg-white hover:text-black transition-colors"><i class="fas fa-external-link-alt"></i></a> -->
+        <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5 lg:gap-8">
+
+            <!-- Keeppy -->
+            <div class="project-card group relative glass p-3 sm:p-5 lg:p-6 rounded-2xl sm:rounded-3xl overflow-hidden">
+                <div class="card-links absolute top-3 right-3 z-10">
+                    <a href="https://github.com/Irshad-11/Keeppy" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full glass flex items-center justify-center text-[10px] sm:text-xs hover:bg-white hover:text-black transition-colors"><i class="fab fa-github"></i></a>
                 </div>
-                <div class="aspect-video bg-white/5 rounded-2xl mb-6 flex items-center justify-center overflow-hidden">
-                    <span class="text-zinc-700 font-black text-4xl italic">ONUBAD</span>
+                <div class="aspect-video bg-white/5 rounded-xl sm:rounded-2xl mb-3 sm:mb-5 flex items-center justify-center">
+                    <span class="text-zinc-700 font-black text-lg sm:text-3xl italic">Keeppy</span>
                 </div>
-                <h3 class="text-xl font-bold mb-2 group-hover:text-white transition-colors">Onubad.ai 🤖</h3>
-                <p class="text-zinc-500 text-sm mb-6 line-clamp-2">Research-focused translator using NLLB-200. Fine-tuning for natural Cholitobhasha context.</p>
-                <div class="flex gap-4 text-zinc-400 text-lg">
+                <h3 class="card-title text-sm sm:text-lg font-bold mb-1 sm:mb-2 transition-colors leading-tight">Keeppy</h3>
+                <p class="text-zinc-500 text-[10px] sm:text-sm mb-3 sm:mb-5 line-clamp-2">Save selected text to a file — one hotkey press.</p>
+                <div class="flex gap-2 sm:gap-3 text-zinc-400 text-sm sm:text-lg">
+                    <i class="devicon-python-plain"></i>
+                    <i class="devicon-linux-plain"></i>
+                </div>
+            </div>
+
+            <!-- Onubad.ai -->
+            <div class="project-card group relative glass p-3 sm:p-5 lg:p-6 rounded-2xl sm:rounded-3xl overflow-hidden">
+                <div class="card-links absolute top-3 right-3 z-10">
+                    <a href="https://github.com/Irshad-11/Onubad.ai" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full glass flex items-center justify-center text-[10px] sm:text-xs hover:bg-white hover:text-black transition-colors"><i class="fab fa-github"></i></a>
+                </div>
+                <div class="aspect-video bg-white/5 rounded-xl sm:rounded-2xl mb-3 sm:mb-5 flex items-center justify-center">
+                    <span class="text-zinc-700 font-black text-lg sm:text-3xl italic">ONUBAD</span>
+                </div>
+                <h3 class="card-title text-sm sm:text-lg font-bold mb-1 sm:mb-2 transition-colors leading-tight">Onubad.ai 🤖</h3>
+                <p class="text-zinc-500 text-[10px] sm:text-sm mb-3 sm:mb-5 line-clamp-2">NLLB-200 translator fine-tuned for natural Cholitobhasha.</p>
+                <div class="flex gap-2 sm:gap-3 text-zinc-400 text-sm sm:text-lg">
                     <i class="devicon-pytorch-original"></i>
                     <i class="devicon-python-plain"></i>
                 </div>
             </div>
 
-            <!-- Project 2 -->
-            <div class="group relative glass p-6 rounded-3xl overflow-hidden transition-all duration-500 hover:-translate-y-2">
-                <div class="absolute top-4 right-4 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <a href="https://github.com/Irshad-11/PDF-INSIGHTS" class="w-8 h-8 rounded-full glass flex items-center justify-center text-xs hover:bg-white hover:text-black transition-colors"><i class="fab fa-github"></i></a>
+            <!-- PDF Insights -->
+            <div class="project-card group relative glass p-3 sm:p-5 lg:p-6 rounded-2xl sm:rounded-3xl overflow-hidden">
+                <div class="card-links absolute top-3 right-3 z-10">
+                    <a href="https://github.com/Irshad-11/PDF-INSIGHTS" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full glass flex items-center justify-center text-[10px] sm:text-xs hover:bg-white hover:text-black transition-colors"><i class="fab fa-github"></i></a>
                 </div>
-                <div class="aspect-video bg-white/5 rounded-2xl mb-6 flex items-center justify-center">
-                    <span class="text-zinc-700 font-black text-4xl italic">PDF INSIGHTS</span>
+                <div class="aspect-video bg-white/5 rounded-xl sm:rounded-2xl mb-3 sm:mb-5 flex items-center justify-center">
+                    <span class="text-zinc-700 font-black text-base sm:text-2xl italic text-center px-1">PDF INSIGHTS</span>
                 </div>
-                <h3 class="text-xl font-bold mb-2 group-hover:text-white transition-colors">PDF INSIGHTS</h3>
-                <p class="text-zinc-500 text-sm mb-6 line-clamp-2">Smart PDF Analyzer with Semantic Search and LaTeX math detection via OCR.</p>
-                <div class="flex gap-4 text-zinc-400 text-lg">
+                <h3 class="card-title text-sm sm:text-lg font-bold mb-1 sm:mb-2 transition-colors leading-tight">PDF INSIGHTS</h3>
+                <p class="text-zinc-500 text-[10px] sm:text-sm mb-3 sm:mb-5 line-clamp-2">Smart PDF Analyzer with Semantic Search and LaTeX OCR.</p>
+                <div class="flex gap-2 sm:gap-3 text-zinc-400 text-sm sm:text-lg">
                     <i class="devicon-flask-original"></i>
                     <i class="devicon-react-original"></i>
                 </div>
             </div>
 
-            <!-- Project 3 -->
-            <div class="group relative glass p-6 rounded-3xl overflow-hidden transition-all duration-500 hover:-translate-y-2">
-                <div class="absolute top-4 right-4 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <a href="https://github.com/Irshad-11/The-AI-AskBook" class="w-8 h-8 rounded-full glass flex items-center justify-center text-xs hover:bg-white hover:text-black transition-colors"><i class="fab fa-github"></i></a>
+            <!-- AI AskBook -->
+            <div class="project-card group relative glass p-3 sm:p-5 lg:p-6 rounded-2xl sm:rounded-3xl overflow-hidden">
+                <div class="card-links absolute top-3 right-3 z-10">
+                    <a href="https://github.com/Irshad-11/The-AI-AskBook" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full glass flex items-center justify-center text-[10px] sm:text-xs hover:bg-white hover:text-black transition-colors"><i class="fab fa-github"></i></a>
                 </div>
-                <div class="aspect-video bg-white/5 rounded-2xl mb-6 flex items-center justify-center">
-                    <span class="text-zinc-700 font-black text-4xl italic">AI AskBook</span>
+                <div class="aspect-video bg-white/5 rounded-xl sm:rounded-2xl mb-3 sm:mb-5 flex items-center justify-center">
+                    <span class="text-zinc-700 font-black text-base sm:text-2xl italic text-center px-1">AI AskBook</span>
                 </div>
-                <h3 class="text-xl font-bold mb-2 group-hover:text-white transition-colors">The AI AskBook</h3>
-                <p class="text-zinc-500 text-sm mb-6 line-clamp-2">A Full Stack Prompt Sharing Platform  - Find Right prompt to unlock your potential</p>
-                <div class="flex gap-4 text-zinc-400 text-lg">
+                <h3 class="card-title text-sm sm:text-lg font-bold mb-1 sm:mb-2 transition-colors leading-tight">The AI AskBook</h3>
+                <p class="text-zinc-500 text-[10px] sm:text-sm mb-3 sm:mb-5 line-clamp-2">Full Stack Prompt Sharing Platform — find the right prompt.</p>
+                <div class="flex gap-2 sm:gap-3 text-zinc-400 text-sm sm:text-lg">
                     <i class="devicon-django-plain"></i>
                     <i class="devicon-python-plain"></i>
                     <i class="devicon-postgresql-plain"></i>
-                    
                 </div>
             </div>
 
-            <!-- Project 4 -->
-            <div class="group relative glass p-6 rounded-3xl overflow-hidden transition-all duration-500 hover:-translate-y-2">
-                <div class="absolute top-4 right-4 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <a href="https://github.com/Irshad-11/The-AI-AskBook" class="w-8 h-8 rounded-full glass flex items-center justify-center text-xs hover:bg-white hover:text-black transition-colors"><i class="fab fa-github"></i></a>
+            <!-- PassGuard CLI -->
+            <div class="project-card group relative glass p-3 sm:p-5 lg:p-6 rounded-2xl sm:rounded-3xl overflow-hidden">
+                <div class="card-links absolute top-3 right-3 z-10">
+                    <a href="https://github.com/Irshad-11" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full glass flex items-center justify-center text-[10px] sm:text-xs hover:bg-white hover:text-black transition-colors"><i class="fab fa-github"></i></a>
                 </div>
-                <div class="aspect-video bg-white/5 rounded-2xl mb-6 flex items-center justify-center">
-                    <span class="text-zinc-700 font-black text-4xl italic">PG — CLI</span>
+                <div class="aspect-video bg-white/5 rounded-xl sm:rounded-2xl mb-3 sm:mb-5 flex items-center justify-center">
+                    <span class="text-zinc-700 font-black text-lg sm:text-3xl italic">PG — CLI</span>
                 </div>
-                <h3 class="text-xl font-bold mb-2 group-hover:text-white transition-colors">PassGuard — CLI</h3>
-                <p class="text-zinc-500 text-sm mb-6 line-clamp-2">A dev-focused security tool. Uses UNIX-style subcommands and encrypted local storage to manage API keys and credentials safely.</p>
-                <div class="flex gap-4 text-zinc-400 text-lg">
-                    <i class="devicon-django-plain"></i>
+                <h3 class="card-title text-sm sm:text-lg font-bold mb-1 sm:mb-2 transition-colors leading-tight">PassGuard — CLI</h3>
+                <p class="text-zinc-500 text-[10px] sm:text-sm mb-3 sm:mb-5 line-clamp-2">Dev security tool with UNIX subcommands and encrypted storage.</p>
+                <div class="flex gap-2 sm:gap-3 text-zinc-400 text-sm sm:text-lg">
                     <i class="devicon-python-plain"></i>
-                    <i class="devicon-postgresql-plain"></i>
-                    
+                    <i class="devicon-sqlite-plain"></i>
                 </div>
             </div>
 
-            <!-- Coming Soon Project Example -->
-            <div class="relative glass p-6 rounded-3xl overflow-hidden">
+            <!-- Coming Soon -->
+            <div class="relative glass p-3 sm:p-5 lg:p-6 rounded-2xl sm:rounded-3xl overflow-hidden">
                 <div class="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
-                    <span class="px-4 py-2 glass rounded-lg text-[15px] mono uppercase font-bold border-white/20">Coming Soon</span>
+                    <span class="px-3 py-1.5 glass rounded-lg text-[10px] sm:text-xs mono uppercase font-bold">Coming Soon</span>
                 </div>
                 <div class="coming-soon-wrapper">
-                    <div class="aspect-video skeleton-pulse rounded-2xl mb-6"></div>
-                    <div class="h-6 w-3/4 skeleton-pulse rounded mb-2"></div>
-                    <div class="h-4 w-full skeleton-pulse rounded mb-4"></div>
-                    <div class="flex gap-4">
-                        <div class="h-6 w-6 skeleton-pulse rounded-full"></div>
-                        <div class="h-6 w-6 skeleton-pulse rounded-full"></div>
+                    <div class="aspect-video skeleton-pulse rounded-xl sm:rounded-2xl mb-3 sm:mb-5"></div>
+                    <div class="h-4 sm:h-6 w-3/4 skeleton-pulse rounded mb-2"></div>
+                    <div class="h-3 sm:h-4 w-full skeleton-pulse rounded mb-3"></div>
+                    <div class="flex gap-3">
+                        <div class="h-4 w-4 skeleton-pulse rounded-full"></div>
+                        <div class="h-4 w-4 skeleton-pulse rounded-full"></div>
                     </div>
                 </div>
             </div>
 
+        </div>
+    </section>
 
-            <div class="relative glass p-6 rounded-3xl overflow-hidden">
-                <div class="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
-                    <span class="px-4 py-2 glass rounded-lg text-[15px] mono uppercase font-bold border-white/20">Coming Soon</span>
+    <!-- Research -->
+    <section id="research" class="py-16 sm:py-24 lg:py-32 px-4 sm:px-8 lg:px-10 max-w-7xl mx-auto">
+        <h2 class="text-[10px] sm:text-xs font-bold uppercase tracking-[0.3em] text-zinc-500 mb-8 sm:mb-12">Academic Research</h2>
+        <div class="relative glass p-6 sm:p-10 rounded-[2rem] sm:rounded-[3rem] overflow-hidden">
+            <div class="absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 sm:gap-4">
+                <div class="w-12 h-12 sm:w-16 sm:h-16 bg-white/5 rounded-full flex items-center justify-center bounce">
+                    <i class="fas fa-lock text-zinc-500 text-sm sm:text-base"></i>
                 </div>
-                <div class="coming-soon-wrapper">
-                    <div class="aspect-video skeleton-pulse rounded-2xl mb-6"></div>
-                    <div class="h-6 w-3/4 skeleton-pulse rounded mb-2"></div>
-                    <div class="h-4 w-full skeleton-pulse rounded mb-4"></div>
-                    <div class="flex gap-4">
-                        <div class="h-6 w-6 skeleton-pulse rounded-full"></div>
-                        <div class="h-6 w-6 skeleton-pulse rounded-full"></div>
-                    </div>
+                <span class="text-[10px] sm:text-xs mono uppercase font-bold tracking-widest px-4 py-2 border border-white/10 rounded-full">Coming Soon</span>
+            </div>
+            <div class="coming-soon-wrapper grid md:grid-cols-2 gap-6 sm:gap-10">
+                <div class="space-y-4 sm:space-y-6">
+                    <div class="h-6 sm:h-8 w-3/4 skeleton-pulse rounded"></div>
+                    <div class="h-3 sm:h-4 w-full skeleton-pulse rounded"></div>
+                    <div class="h-3 sm:h-4 w-5/6 skeleton-pulse rounded"></div>
+                    <div class="h-3 sm:h-4 w-2/3 skeleton-pulse rounded"></div>
                 </div>
+                <div class="aspect-square bg-white/5 skeleton-pulse rounded-2xl sm:rounded-3xl"></div>
             </div>
         </div>
     </section>
 
-    <!-- Generic Coming Soon Section (Reusable) -->
-    <section id="research" class="py-32 px-10 max-w-7xl mx-auto">
-        <h2 class="text-xs font-bold uppercase tracking-[0.3em] text-zinc-500 mb-12">Academic Research</h2>
-        <div class="relative glass p-10 rounded-[3rem] overflow-hidden">
-             <div class="absolute inset-0 z-20 flex flex-col items-center justify-center">
-                 <div class="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-4 animate-bounce">
-                    <i class="fas fa-lock text-zinc-500"></i>
-                 </div>
-                 <span class="text-xs mono uppercase font-bold tracking-widest px-4 py-2 border border-white/10 rounded-full">Coming Soon</span>
-             </div>
-             <div class="coming-soon-wrapper grid md:grid-cols-2 gap-10">
-                 <div class="space-y-6">
-                     <div class="h-8 w-3/4 skeleton-pulse rounded"></div>
-                     <div class="h-4 w-full skeleton-pulse rounded"></div>
-                     <div class="h-4 w-5/6 skeleton-pulse rounded"></div>
-                     <div class="h-4 w-2/3 skeleton-pulse rounded"></div>
-                 </div>
-                 <div class="aspect-square bg-white/5 skeleton-pulse rounded-3xl"></div>
-             </div>
-        </div>
-    </section>
-
-    <!-- Footer / Contact -->
-    <footer id="contact" class="py-20 px-10 border-t border-white/5">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-10">
+    <!-- Footer -->
+    <footer id="contact" class="py-12 sm:py-20 px-4 sm:px-8 lg:px-10 border-t border-white/5 mb-16 md:mb-0">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8 sm:gap-10">
             <div>
-                <p class="text-xs text-zinc-500 mono mb-4 uppercase tracking-widest">Connect with me</p>
-                <div class="flex gap-4">
-                    <a href="https://github.com/Irshad-11" class="px-6 py-3 glass rounded-full text-sm font-bold flex items-center gap-2 hover:bg-white hover:text-black transition-all">
+                <p class="text-[10px] sm:text-xs text-zinc-500 mono mb-3 sm:mb-4 uppercase tracking-widest">Connect with me</p>
+                <div class="flex gap-3 sm:gap-4">
+                    <a href="https://github.com/Irshad-11" class="px-4 sm:px-6 py-2.5 sm:py-3 glass rounded-full text-xs sm:text-sm font-bold flex items-center gap-2 hover:bg-white hover:text-black transition-all active:scale-95">
                         <i class="fab fa-github"></i> GitHub
                     </a>
-                    <a href="https://www.linkedin.com/in/irshad-hossain-785548323/" class="px-6 py-3 glass rounded-full text-sm font-bold flex items-center gap-2 hover:bg-white hover:text-black transition-all">
+                    <a href="https://www.linkedin.com/in/irshad-hossain-785548323/" class="px-4 sm:px-6 py-2.5 sm:py-3 glass rounded-full text-xs sm:text-sm font-bold flex items-center gap-2 hover:bg-white hover:text-black transition-all active:scale-95">
                         <i class="fab fa-linkedin"></i> LinkedIn
+                    </a>
+                    <a href="mailto:email@example.com" class="px-4 sm:px-6 py-2.5 sm:py-3 glass rounded-full text-xs sm:text-sm font-bold flex items-center gap-2 hover:bg-white hover:text-black transition-all active:scale-95">
+                        <i class="fas fa-envelope"></i>
                     </a>
                 </div>
             </div>
             <div class="text-center md:text-right">
-                <p class="text-zinc-500 text-sm mb-2">Developed by Irshad Hossain</p>
+                <p class="text-zinc-500 text-xs sm:text-sm mb-1 sm:mb-2">Built by Irshad Hossain</p>
                 <p class="text-[10px] mono text-zinc-700">© 2026. ALL RIGHTS RESERVED.</p>
             </div>
         </div>
     </footer>
 
+    <!-- Mobile Bottom Nav -->
+    <nav class="fixed bottom-0 left-0 right-0 z-50 md:hidden">
+        <div class="mx-3 mb-3 glass rounded-2xl px-4 py-3 flex justify-around items-center">
+            <a href="#skills"   class="flex flex-col items-center gap-1 text-zinc-500 hover:text-white transition-colors">
+                <i class="fas fa-code text-sm"></i>
+                <span class="text-[9px] mono uppercase">Skills</span>
+            </a>
+            <a href="#projects" class="flex flex-col items-center gap-1 text-zinc-500 hover:text-white transition-colors">
+                <i class="fas fa-folder-open text-sm"></i>
+                <span class="text-[9px] mono uppercase">Works</span>
+            </a>
+            <a href="#research" class="flex flex-col items-center gap-1 text-zinc-500 hover:text-white transition-colors">
+                <i class="fas fa-flask text-sm"></i>
+                <span class="text-[9px] mono uppercase">Research</span>
+            </a>
+            <a href="#contact"  class="flex flex-col items-center gap-1 text-zinc-500 hover:text-white transition-colors">
+                <i class="fas fa-at text-sm"></i>
+                <span class="text-[9px] mono uppercase">Contact</span>
+            </a>
+        </div>
+    </nav>
+
     <script>
+    (function () {
+        'use strict';
 
+        const isDesktop = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
-        // --- SMART SCROLL NAVIGATION LOGIC ---
-        const mainNav = document.getElementById('main-nav');
-        const navContainer = document.getElementById('nav-container');
-        const navLogo = document.getElementById('nav-logo');
-        const navLinks = document.getElementById('nav-links');
-        
-        let lastScrollY = window.scrollY;
+        /* ═══════════════════════════════════
+           CURSOR + COLORFUL GLOWING TRAIL
+        ═══════════════════════════════════ */
+        if (isDesktop) {
+            const dot = document.getElementById('cursor-dot');
 
-        window.addEventListener('scroll', () => {
-            const currentScrollY = window.scrollY;
+            const TRAIL_N = 20;
+            const COLORS  = [
+                '#c084fc','#a78bfa','#818cf8',
+                '#60a5fa','#38bdf8','#34d399',
+                '#fbbf24','#fb923c','#f87171',
+                '#f472b6','#e879f9','#a78bfa'
+            ];
 
-            // Simple safety check to prevent trigger on mobile elastic bouncing
-            if (Math.abs(currentScrollY - lastScrollY) <= 5) return;
-
-            if (currentScrollY > 120) {
-                if (currentScrollY > lastScrollY) {
-                    // SCROLLING DOWN: Hide it smoothly past the header
-                    mainNav.classList.remove('top-0', 'bottom-0', 'p-4');
-                    mainNav.classList.add('-top-24', 'p-6');
-                } else {
-                    // SCROLLING UP: Beautifully dock to the bottom with stable compact scaling
-                    mainNav.classList.remove('-top-24', 'top-0', 'p-6');
-                    mainNav.classList.add('bottom-0', 'p-4');
-                    
-                    // Compact adjustments - max-w-2xl offers zero structural overflow layout breakage
-                    navContainer.classList.remove('max-w-6xl', 'px-8', 'py-4');
-                    navContainer.classList.add('max-w-2xl', 'px-6', 'py-3', 'shadow-2xl');
-                    
-                    // Fine-tune inner spacing scaling down slightly
-                    navLogo.classList.remove('text-xl');
-                    navLogo.classList.add('text-base');
-                    navLinks.classList.remove('space-x-6');
-                    navLinks.classList.add('space-x-4');
-                }
-            } else {
-                // BACK AT THE TOP: Reset natively back up to traditional hero header positions
-                mainNav.classList.remove('bottom-0', '-top-24', 'p-4');
-                mainNav.classList.add('top-0', 'p-6');
-                
-                navContainer.classList.remove('max-w-2xl', 'px-6', 'py-3', 'shadow-2xl');
-                navContainer.classList.add('max-w-6xl', 'px-8', 'py-4');
-                
-                navLogo.classList.remove('text-base');
-                navLogo.classList.add('text-xl');
-                navLinks.classList.remove('space-x-4');
-                navLinks.classList.add('space-x-6');
+            /* Build trail particles */
+            const particles = [];
+            for (let i = 0; i < TRAIL_N; i++) {
+                const size  = Math.max(2, 7 - i * 0.25);
+                const color = COLORS[i % COLORS.length];
+                const el    = document.createElement('div');
+                el.className = 'trail-dot';
+                el.style.cssText = [
+                    `width:${size}px`,
+                    `height:${size}px`,
+                    `background:${color}`,
+                    `box-shadow:0 0 ${size * 2}px ${color}88`,
+                    `opacity:0`
+                ].join(';');
+                document.body.appendChild(el);
+                particles.push({ el, x: 0, y: 0, color });
             }
 
-            lastScrollY = currentScrollY;
-        });
+            let mx = 0, my = 0, started = false;
 
-        // --- THREE.JS BACKGROUND ---
-        const canvas = document.querySelector('#bg-canvas');
-        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-        renderer.setPixelRatio(window.devicePixelRatio);
-        renderer.setSize(window.innerWidth, window.innerHeight);
+            document.addEventListener('mousemove', (e) => {
+                mx = e.clientX; my = e.clientY;
+                dot.style.left = mx + 'px';
+                dot.style.top  = my + 'px';
+                if (!started) { started = true; loop(); }
+            }, { passive: true });
 
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 20, 40);
-        camera.lookAt(0, 0, 0);
+            /* Lerp speeds: front particles faster, tail slower */
+            function lerp(a, b, t) { return a + (b - a) * t; }
 
-        // Grid Geometry
-        const size = 100;
-        const divisions = 40;
-        const geometry = new THREE.PlaneGeometry(size, size, divisions, divisions);
-        geometry.rotateX(-Math.PI / 2);
-
-        const material = new THREE.MeshBasicMaterial({
-            color: 0xffffff,
-            wireframe: true,
-            transparent: true,
-            opacity: 0.05
-        });
-
-        const grid = new THREE.Mesh(geometry, material);
-        scene.add(grid);
-
-        // Animation State
-        let time = 0;
-        let mouseX = 0;
-        let mouseY = 0;
-
-        document.addEventListener('mousemove', (e) => {
-            mouseX = (e.clientX - window.innerWidth / 2) / 100;
-            mouseY = (e.clientY - window.innerHeight / 2) / 100;
-        });
-
-        function animate() {
-            requestAnimationFrame(animate);
-            time += 0.01;
-
-            // Wave Distortion
-            const positionAttribute = geometry.getAttribute('position');
-            for (let i = 0; i < positionAttribute.count; i++) {
-                const x = positionAttribute.getX(i);
-                const z = positionAttribute.getZ(i);
-                const y = Math.sin(x * 0.2 + time) * 1.5 + Math.cos(z * 0.2 + time) * 1.5;
-                positionAttribute.setY(i, y);
+            function loop() {
+                let px = mx, py = my;
+                particles.forEach((p, i) => {
+                    const t = 0.30 - i * 0.009;
+                    p.x = lerp(p.x, px, t);
+                    p.y = lerp(p.y, py, t);
+                    p.el.style.left    = p.x + 'px';
+                    p.el.style.top     = p.y + 'px';
+                    p.el.style.opacity = String(Math.max(0, 0.9 - i * 0.042));
+                    px = p.x; py = p.y;
+                });
+                requestAnimationFrame(loop);
             }
-            positionAttribute.needsUpdate = true;
 
-            // Parallax Tilt
-            grid.rotation.y = THREE.MathUtils.lerp(grid.rotation.y, mouseX * 0.05, 0.1);
-            grid.rotation.x = THREE.MathUtils.lerp(grid.rotation.x, mouseY * 0.05, 0.1);
+            document.addEventListener('mouseleave', () => {
+                dot.style.opacity = '0';
+                particles.forEach(p => { p.el.style.opacity = '0'; });
+            });
+            document.addEventListener('mouseenter', () => { dot.style.opacity = '1'; });
 
-            renderer.render(scene, camera);
+            /* Hover expand */
+            document.querySelectorAll('a, button').forEach(el => {
+                el.addEventListener('mouseenter', () => dot.classList.add('hovering'));
+                el.addEventListener('mouseleave', () => dot.classList.remove('hovering'));
+            });
         }
-        animate();
 
-        // --- CURSOR LOGIC ---
-        const ring = document.getElementById('cursor-ring');
-        document.addEventListener('mousemove', (e) => {
-            ring.style.left = e.clientX + 'px';
-            ring.style.top = e.clientY + 'px';
-        });
+        /* ═══════════════════════════════════
+           THREE.JS WAVE GRID (large desktop)
+        ═══════════════════════════════════ */
+        const isLarge = window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 1024px)').matches;
+        if (isLarge) {
+            const s = document.createElement('script');
+            s.src   = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+            s.onload = initThree;
+            document.head.appendChild(s);
+        }
 
-        const interactables = document.querySelectorAll('a, button, .group, .skill-icon');
-        interactables.forEach(el => {
-            el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
-            el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
-        });
-
-        // --- MAGNETIC BUTTON ---
-        const magBtn = document.getElementById('magnetic-btn');
-        magBtn.addEventListener('mousemove', (e) => {
-            const rect = magBtn.getBoundingClientRect();
-            const x = e.clientX - rect.left - rect.width / 2;
-            const y = e.clientY - rect.top - rect.height / 2;
-            magBtn.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
-        });
-        magBtn.addEventListener('mouseleave', () => {
-            magBtn.style.transform = `translate(0, 0)`;
-        });
-
-        // --- RESIZE HANDLER ---
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
+        function initThree() {
+            const canvas = document.getElementById('bg-canvas');
+            canvas.style.display = 'block';
+            const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: true });
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
             renderer.setSize(window.innerWidth, window.innerHeight);
-        });
+
+            const scene  = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 20, 40); camera.lookAt(0, 0, 0);
+
+            const geo = new THREE.PlaneGeometry(100, 100, 40, 40);
+            geo.rotateX(-Math.PI / 2);
+            const mat  = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true, transparent: true, opacity: 0.045 });
+            const grid = new THREE.Mesh(geo, mat);
+            scene.add(grid);
+
+            let time = 0, mx = 0, my = 0;
+            document.addEventListener('mousemove', (e) => {
+                mx = (e.clientX - window.innerWidth  / 2) / 120;
+                my = (e.clientY - window.innerHeight / 2) / 120;
+            }, { passive: true });
+
+            const pos = geo.getAttribute('position');
+            (function animate() {
+                requestAnimationFrame(animate);
+                time += 0.008;
+                for (let i = 0; i < pos.count; i++) {
+                    pos.setY(i, Math.sin(pos.getX(i) * 0.2 + time) * 1.5 + Math.cos(pos.getZ(i) * 0.2 + time) * 1.5);
+                }
+                pos.needsUpdate = true;
+                grid.rotation.y = THREE.MathUtils.lerp(grid.rotation.y, mx * 0.05, 0.08);
+                grid.rotation.x = THREE.MathUtils.lerp(grid.rotation.x, my * 0.05, 0.08);
+                renderer.render(scene, camera);
+            })();
+
+            let rt;
+            window.addEventListener('resize', () => {
+                clearTimeout(rt);
+                rt = setTimeout(() => {
+                    camera.aspect = window.innerWidth / window.innerHeight;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(window.innerWidth, window.innerHeight);
+                }, 200);
+            });
+        }
+
+        /* ═══════════════════════════════════
+           SMART NAV (desktop only)
+        ═══════════════════════════════════ */
+        if (isDesktop) {
+            const nav = document.getElementById('main-nav');
+            let lastY = 0, ticking = false;
+            window.addEventListener('scroll', () => {
+                if (!ticking) {
+                    requestAnimationFrame(() => {
+                        const y = window.scrollY;
+                        if (Math.abs(y - lastY) > 5) {
+                            if (y > 120) {
+                                if (y > lastY) {
+                                    nav.style.top = '-80px'; nav.style.bottom = 'auto';
+                                } else {
+                                    nav.style.top = 'auto'; nav.style.bottom = '0'; nav.style.padding = '0.5rem 1rem';
+                                }
+                            } else {
+                                nav.style.top = '0'; nav.style.bottom = 'auto'; nav.style.padding = '';
+                            }
+                            lastY = y;
+                        }
+                        ticking = false;
+                    });
+                    ticking = true;
+                }
+            }, { passive: true });
+        }
+
+        /* ═══════════════════════════════════
+           MAGNETIC BUTTON
+        ═══════════════════════════════════ */
+        if (isDesktop) {
+            const btn = document.getElementById('magnetic-btn');
+            if (btn) {
+                btn.addEventListener('mousemove', (e) => {
+                    const r = btn.getBoundingClientRect();
+                    btn.style.transform = `translate(${(e.clientX - r.left - r.width  / 2) * 0.3}px,${(e.clientY - r.top  - r.height / 2) * 0.3}px)`;
+                });
+                btn.addEventListener('mouseleave', () => { btn.style.transform = ''; });
+            }
+        }
+
+        /* ═══════════════════════════════════
+           MOBILE: tap project card to reveal links
+        ═══════════════════════════════════ */
+        if (!isDesktop) {
+            document.querySelectorAll('.project-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const lk = card.querySelector('.card-links');
+                    if (lk) lk.style.opacity = lk.style.opacity === '1' ? '0' : '1';
+                });
+            });
+        }
+
+    })();
     </script>
 </body>
 </html>
