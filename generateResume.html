@@ -868,6 +868,10 @@
         border-radius: 10px;
         padding: 18px 20px;
         box-shadow: var(--shadow-sm);
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        align-items: center;
       }
 
       .stat-card .stat-num {
@@ -1380,6 +1384,120 @@
         border-color: #854d0e;
         color: #fcd34d;
       }
+
+
+
+      /* ============================================================
+   DEVELOPER INFO — FACEBOOK-STYLE PROFILE
+   ============================================================ */
+.fb-profile { max-width: 900px; margin: 0 auto; }
+
+.fb-cover {
+  height: 200px;
+  border-radius: var(--radius);
+  /* background: linear-gradient(135deg, var(--accent), #7c3aed 70%); */
+  background-image: url('https://i.pinimg.com/1200x/b7/77/e2/b777e2098840748e16487f40feb81dca.jpg');
+  position: relative;
+  
+  /* Centered and original size */
+  background-position: top;
+  background-repeat: no-repeat;
+  background-size: auto; 
+}
+
+.fb-avatar-wrap { position: absolute; left: 24px; bottom: -42px; }
+
+.fb-avatar {
+  width: 96px; height: 96px;
+  border-radius: 50%;
+  border: 4px solid var(--bg-base);
+  background: linear-gradient(135deg, #2a3eea, var(--accent));
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 30px; font-weight: 800;
+  box-shadow: var(--shadow-md);
+}
+
+.fb-header { padding: 52px 24px 0; }
+.fb-name { font-size: 22px; font-weight: 800; color: var(--text-primary); }
+.fb-title { font-size: 13px; font-weight: 600; color: var(--accent); margin-top: 2px; }
+.fb-tagline { font-size: 13px; color: var(--text-secondary); margin-top: 10px; max-width: 560px; line-height: 1.6; }
+
+.fb-links-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+
+.fb-link-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 14px; border-radius: 7px;
+  font-size: 12.5px; font-weight: 600;
+  background: var(--bg-muted); color: var(--text-secondary);
+  border: 1px solid var(--border);
+  text-decoration: none;
+  transition: background var(--transition), color var(--transition);
+}
+.fb-link-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+.fb-link-btn-sm { padding: 5px 11px; font-size: 11.5px; }
+
+.fb-tabs-row {
+  display: flex; gap: 4px;
+  border-bottom: 1px solid var(--border);
+  margin: 20px 0 0; padding: 0 4px;
+  overflow-x: auto; scrollbar-width: none;
+}
+.fb-tabs-row::-webkit-scrollbar { display: none; }
+
+.fb-tab {
+  flex-shrink: 0; padding: 10px 16px;
+  font-size: 13px; font-weight: 600;
+  color: var(--text-secondary);
+  background: transparent; border: none;
+  border-bottom: 3px solid transparent;
+  cursor: pointer; font-family: inherit; white-space: nowrap;
+  transition: color var(--transition), border-color var(--transition);
+}
+.fb-tab:hover { color: var(--text-primary); }
+.fb-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+.fb-body { display: grid; grid-template-columns: 280px 1fr; gap: 18px; margin-top: 18px; }
+.fb-intro-card { align-self: start; position: sticky; top: 12px; }
+
+.fb-intro-item {
+  display: flex; align-items: flex-start; gap: 9px;
+  font-size: 12.5px; color: var(--text-secondary);
+  padding: 8px 0; border-bottom: 1px solid var(--border);
+}
+.fb-intro-item:last-of-type { border-bottom: none; }
+.fb-intro-item i { color: var(--text-muted); margin-top: 1px; flex-shrink: 0; }
+
+.fb-chip-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.fb-chip { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 600; }
+.fb-chip-blue   { background: #dde7ff; color: #2a3eea; }
+.fb-chip-purple { background: #ede4ff; color: #7c3aed; }
+.fb-chip-green  { background: #d8f5e3; color: #16a34a; }
+.fb-chip-amber  { background: #fef3c7; color: #b45309; }
+[data-theme="dark"] .fb-chip-blue   { background: #1e2368; color: #97b4fe; }
+[data-theme="dark"] .fb-chip-purple { background: #2c1f57; color: #c4a6ff; }
+[data-theme="dark"] .fb-chip-green  { background: #103322; color: #4ade80; }
+[data-theme="dark"] .fb-chip-amber  { background: #3a2a08; color: #fbbf24; }
+
+.fb-bullets { margin: 8px 0 12px 0; padding-left: 18px; font-size: 13px; color: var(--text-secondary); line-height: 1.7; }
+.fb-bullets li { margin-bottom: 3px; }
+
+.fb-feed .fb-post { margin-bottom: 16px; }
+.fb-feed .fb-post:last-child { margin-bottom: 0; }
+
+@media (max-width: 768px) {
+  .fb-cover { height: 150px; border-radius: 8px; }
+  .fb-avatar { width: 76px; height: 76px; font-size: 24px; }
+  .fb-avatar-wrap { left: 50%; transform: translateX(-50%); bottom: -34px; }
+  .fb-header { padding: 44px 12px 0; text-align: center; }
+  .fb-tagline { margin-left: auto; margin-right: auto; }
+  .fb-links-row { justify-content: center; }
+  .fb-body { grid-template-columns: 1fr; margin-top: 14px; }
+  .fb-intro-card { position: static; }
+}
+
+
+
     </style>
   </head>
 
@@ -1487,6 +1605,9 @@
           <div class="sidebar-item" onclick="UI.navigate('devdocs')">
             <i data-lucide="code" size="16" class="item-icon"></i> Template Docs
           </div>
+          <div class="sidebar-item" data-view="devinfo" onclick="UI.navigate('devinfo')">
+            <i data-lucide="badge-check" size="16" class="item-icon"></i> Developer Info
+          </div>
         </div>
 
         <div style="flex: 1"></div>
@@ -1502,7 +1623,7 @@
           <div style="font-size: 11px; color: var(--text-muted)">
             <strong style="color: var(--text-secondary)">ResumeForge</strong>
             v1.0<br />
-            IRSHAD HOSSAIN
+            by IRSHAD HOSSAIN
           </div>
         </div>
       </aside>
@@ -1665,6 +1786,7 @@
           const f = folders.find(x => x.id === id);
           if (!f) return;
           Modal.prompt('Rename Folder', 'New name:', f.name, (val) => {
+            
             if (!val.trim()) return;
             f.name = val.trim();
             FolderManager.saveFolders(folders);
@@ -4233,41 +4355,51 @@ ${main}
          MODULE: MODAL
          ============================================================ */
       const Modal = (() => {
-        function open(title, bodyHtml, footerHtml) {
-          document.getElementById('modal-title').textContent = title;
-          document.getElementById('modal-body').innerHTML  = bodyHtml;
-          document.getElementById('modal-footer').innerHTML = footerHtml || '<button class="btn btn-ghost" onclick="Modal.close()">Cancel</button>';
-          document.getElementById('modal-backdrop').classList.add('open');
-        }
+  let _cb = null; // holds the real callback function (preserves closure)
 
-        function close() {
-          document.getElementById('modal-backdrop').classList.remove('open');
-        }
+  function open(title, bodyHtml, footerHtml) {
+    document.getElementById('modal-title').textContent = title;
+    document.getElementById('modal-body').innerHTML  = bodyHtml;
+    document.getElementById('modal-footer').innerHTML = footerHtml || '<button class="btn btn-ghost" onclick="Modal.close()">Cancel</button>';
+    document.getElementById('modal-backdrop').classList.add('open');
+  }
 
-        function prompt(title, label, defaultVal, cb) {
-          const id = 'modal-input-' + Date.now();
-          open(title,
-            `<label class="form-label">${label}</label><input id="${id}" class="form-input" value="${he(defaultVal||'')}"/>`,
-            `<button class="btn btn-ghost" onclick="Modal.close()">Cancel</button>
-             <button class="btn btn-primary" onclick="Modal.close(); (${cb.toString()})(document.getElementById('${id}').value)">OK</button>`
-          );
-          setTimeout(() => {
-            const inp = document.getElementById(id);
-            if (inp) { inp.focus(); inp.select(); }
-          }, 100);
-        }
+  function close() {
+    document.getElementById('modal-backdrop').classList.remove('open');
+  }
 
-        function confirm(title, message, cb) {
-          open(title, `<p style="color:var(--text-secondary);">${message}</p>`,
-            `<button class="btn btn-ghost" onclick="Modal.close()">Cancel</button>
-             <button class="btn btn-danger" onclick="Modal.close(); (${cb.toString()})()">Delete</button>`
-          );
-        }
+  function _run(...args) {
+    const fn = _cb;
+    _cb = null;
+    if (typeof fn === 'function') fn(...args);
+  }
 
-        function select(title, bodyHtml, footerHtml) { open(title, bodyHtml, footerHtml); }
+  function prompt(title, label, defaultVal, cb) {
+    const id = 'modal-input-' + Date.now();
+    _cb = cb; // keep the real reference, don't stringify it
+    open(title,
+      `<label class="form-label">${label}</label><input id="${id}" class="form-input" value="${he(defaultVal||'')}"/>`,
+      `<button class="btn btn-ghost" onclick="Modal.close()">Cancel</button>
+       <button class="btn btn-primary" onclick="Modal.close(); Modal._run(document.getElementById('${id}').value)">OK</button>`
+    );
+    setTimeout(() => {
+      const inp = document.getElementById(id);
+      if (inp) { inp.focus(); inp.select(); }
+    }, 100);
+  }
 
-        return { open, close, prompt, confirm, select };
-      })();
+  function confirm(title, message, cb) {
+    _cb = cb;
+    open(title, `<p style="color:var(--text-secondary);">${message}</p>`,
+      `<button class="btn btn-ghost" onclick="Modal.close()">Cancel</button>
+       <button class="btn btn-danger" onclick="Modal.close(); Modal._run()">Delete</button>`
+    );
+  }
+
+  function select(title, bodyHtml, footerHtml) { open(title, bodyHtml, footerHtml); }
+
+  return { open, close, prompt, confirm, select, _run };
+})();
 
 
       /* ============================================================
@@ -4391,6 +4523,12 @@ ${main}
             c.style.padding = '24px';
             c.style.maxWidth = '900px';
             c.innerHTML = renderDevDocs();
+            mobileBtn.style.display = 'none';
+          }
+          else if (currentView === 'devinfo') {
+            c.style.padding = '24px';
+            c.style.maxWidth = '900px';
+            c.innerHTML = renderDevInfo();
             mobileBtn.style.display = 'none';
           }
 
@@ -4517,7 +4655,7 @@ ${main}
                     <h1 style="font-size:22px; font-weight:800; margin-bottom:4px;">
                       ${profile.firstName ? `Hello, ${he(profile.firstName)}! 👋` : 'Welcome to ResumeForge'}
                     </h1>
-                    <p style="opacity:.85; font-size:13px;">Build ATS-friendly resumes · Copy to Overleaf · 100% offline</p>
+                    <p style="opacity:.85; font-size:13px;">Build ATS-friendly resumes · Copy to Overleaf · No Backend</p>
                   </div>
                   <div style="display:flex; gap:8px; flex-wrap:wrap;">
                     ${!profileComplete ? `
@@ -4554,7 +4692,7 @@ ${main}
                 <div class="stat-label">Templates</div>
               </div>
               <div class="stat-card">
-                <div class="stat-num">${profileComplete ? '✓' : '!'}</div>
+                <div class="stat-num">${profileComplete ? '🎖️' : '📢'}</div>
                 <div class="stat-label">Profile ${profileComplete ? 'Complete' : 'Incomplete'}</div>
               </div>
             </div>
@@ -5679,6 +5817,245 @@ ${main}
         }
 
 
+        // ── DEVELOPER INFO (Facebook-style profile) ────────────────────
+// 🔧 EDIT THESE with your real links — that's the only thing you need to change
+const DEV_INFO_LINKS = {
+  email: 'mailto:irshadrisad@gmail.com',
+  facebook: 'https://www.facebook.com/irshad.risad',
+  linkedin: 'https://www.linkedin.com/in/irshad-hossain-785548323/',
+  github: 'https://github.com/Irshad-11',
+  projects: {
+    onubad: 'https://github.com/Irshad-11/onubad.ai',
+    askbookRepo: 'https://github.com/Irshad-11/The-AI-AskBook',
+    askbookLive: 'https://the-ai-askbook.onrender.com/',
+    pdfInsights: 'https://github.com/Irshad-11/pdf-insights',
+    viewMore: 'https://github.com/Irshad-11?tab=repositories'
+  }
+};
+
+function switchDevInfoTab(tab) {
+  document.querySelectorAll('.fb-tab').forEach(el => el.classList.toggle('active', el.dataset.devtab === tab));
+  document.querySelectorAll('.fb-panel').forEach(el => el.style.display = el.dataset.devtab === tab ? '' : 'none');
+}
+
+function renderDevInfo() {
+  const L = DEV_INFO_LINKS;
+  return `
+    <div class="fb-profile">
+      <!-- COVER / BANNER — replace with style="background-image:url('your-banner.jpg')" for a real photo -->
+      <div class="fb-cover">
+        <div class="fb-avatar-wrap">
+          <div class="fb-avatar">IH</div>
+        </div>
+      </div>
+
+      <!-- HEADER -->
+      <div class="fb-header">
+        <h1 class="fb-name">Irshad Hossain</h1>
+        <div class="fb-title">Backend · ML · Research</div>
+        <p class="fb-tagline">Software Engineering student turning into a Backend + AI/ML Engineer — building free, flexible alternatives to expensive tools, one project at a time.</p>
+
+        <div class="fb-links-row">
+          <a class="fb-link-btn" href="${L.email}"><i data-lucide="mail" size="15"></i> Email</a>
+          <a class="fb-link-btn" href="${L.facebook}" target="_blank" rel="noopener"><i data-lucide="users" size="15"></i> Facebook</a>
+          <a class="fb-link-btn" href="${L.linkedin}" target="_blank" rel="noopener"><i data-lucide="briefcase" size="15"></i> LinkedIn</a>
+          <a class="fb-link-btn" href="${L.github}" target="_blank" rel="noopener"><i data-lucide="code-2" size="15"></i> GitHub</a>
+        </div>
+      </div>
+
+      <!-- TABS -->
+      <div class="fb-tabs-row">
+        <button class="fb-tab active" data-devtab="overview"   onclick="UI.switchDevInfoTab('overview')">Overview</button>
+        <button class="fb-tab"        data-devtab="skills"     onclick="UI.switchDevInfoTab('skills')">Skills</button>
+        <button class="fb-tab"        data-devtab="experience" onclick="UI.switchDevInfoTab('experience')">Experience</button>
+        <button class="fb-tab"        data-devtab="projects"   onclick="UI.switchDevInfoTab('projects')">Projects</button>
+        <button class="fb-tab"        data-devtab="education"  onclick="UI.switchDevInfoTab('education')">Education</button>
+      </div>
+
+      <!-- BODY -->
+      <div class="fb-body">
+        <!-- LEFT: INTRO CARD (always visible, like Facebook's Intro box) -->
+        <div class="card fb-intro-card">
+          <div class="card-header">Intro</div>
+          <div class="card-body">
+            <div class="fb-intro-item"><i data-lucide="graduation-cap" size="15"></i> BSc (Engg) in Software Engineering</div>
+            <div class="fb-intro-item"><i data-lucide="map-pin" size="15"></i> University of Frontier Technology, Bangladesh</div>
+            <div class="fb-intro-item"><i data-lucide="search" size="15"></i> Looking for an ML Internship</div>
+            <div class="fb-intro-item"><i data-lucide="heart" size="15"></i> Loves replacing $100 tools with free code</div>
+            <div style="margin-top:14px; font-size:11px; font-weight:700; letter-spacing:.03em; color:var(--text-muted); text-transform:uppercase;">Top Tools</div>
+            <div class="fb-chip-row" style="margin-top:8px;">
+              <span class="fb-chip fb-chip-blue">Python</span>
+              <span class="fb-chip fb-chip-blue">FastAPI</span>
+              <span class="fb-chip fb-chip-purple">React</span>
+              <span class="fb-chip fb-chip-purple">Tailwind</span>
+              <span class="fb-chip fb-chip-green">PostgreSQL</span>
+              <span class="fb-chip fb-chip-green">SQLite</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: FEED ("posts") -->
+        <div class="fb-feed">
+
+          <!-- OVERVIEW -->
+          <div class="fb-panel" data-devtab="overview">
+            <div class="card fb-post">
+              <div class="card-header">About Me</div>
+              <div class="card-body" style="font-size:13.5px; line-height:1.8; color:var(--text-secondary);">
+                <p>I'm a Software Engineering student working toward becoming a Backend + AI/ML Engineer. I love solving everyday problems through code, and I don't enjoy seeing tools that cost thousands of dollars when the same thing can be built for free, with more flexibility and better features.</p>
+                <p style="margin-top:10px;">My day-to-day stack is FastAPI, with solid experience in Django and Flask. On the frontend I work with React and Tailwind, and PostgreSQL / SQLite handle the data side.</p>
+                <p style="margin-top:10px;">Right now I'm deep in ML and DL, doing some research on the side, while also learning Flutter for my academics. Once that pressure eases up, I'm going all-in on Machine Learning — aiming to publish real research papers.</p>
+                
+              </div>
+            </div>
+          </div>
+
+          <!-- SKILLS -->
+          <div class="fb-panel" data-devtab="skills" style="display:none;">
+            <div class="card fb-post" style="margin-bottom:16px;">
+              <div class="card-header">Skill Matrix</div>
+              <div class="card-body" style="font-size:13px; color:var(--text-secondary); line-height:1.7;">
+                <div style="margin-bottom:14px;">
+                  <div style="font-weight:700; color:var(--text-primary); margin-bottom:6px;">CS Fundamentals</div>
+                  OOP · Data Structures (Stack, Queue, Linked List, Trees, Heaps) · Algorithms (Graphs, Sorting, Searching)
+                </div>
+                <div style="margin-bottom:14px;">
+                  <div style="font-weight:700; color:var(--text-primary); margin-bottom:6px;">Engineering</div>
+                  System Design (Scaling, Sharding) · Software Architecture (Clean, MVC, SOLID) · Research Methodology
+                </div>
+                <div>
+                  <div style="font-weight:700; color:var(--text-primary); margin-bottom:6px;">AI / ML</div>
+                  Deep Learning &amp; Neural Networks (CNN, RNN) · Model Deployment · Feature Engineering
+                </div>
+              </div>
+            </div>
+            <div class="card fb-post">
+              <div class="card-header">Tools &amp; Technologies</div>
+              <div class="card-body">
+                <div class="fb-chip-row">
+                  <span class="fb-chip fb-chip-blue">Python</span>
+                  <span class="fb-chip fb-chip-blue">FastAPI</span>
+                  <span class="fb-chip fb-chip-blue">Django</span>
+                  <span class="fb-chip fb-chip-blue">Flask</span>
+                  <span class="fb-chip fb-chip-purple">React</span>
+                  <span class="fb-chip fb-chip-purple">Tailwind</span>
+                  <span class="fb-chip fb-chip-green">PostgreSQL</span>
+                  <span class="fb-chip fb-chip-green">SQLite</span>
+                  <span class="fb-chip fb-chip-amber">TypeScript</span>
+                  <span class="fb-chip fb-chip-amber">JavaScript</span>
+                </div>
+                <div style="margin-top:10px; font-size:12px; color:var(--text-muted);">+ several other tools across the ML/DL and DevOps space</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- EXPERIENCE -->
+          <div class="fb-panel" data-devtab="experience" style="display:none;">
+            <div class="card fb-post">
+              <div class="empty-state">
+                <i data-lucide="briefcase" size="36"></i>
+                <h3>No Professional Experience Yet</h3>
+                <p>Currently looking for my first break — open to any Internship opportunity to build real-world experience and contribute to live projects.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- PROJECTS ("posts") -->
+          <div class="fb-panel" data-devtab="projects" style="display:none;">
+
+            <div class="card fb-post">
+              <div class="card-header"><span>🤖🇧🇩 Onubad.ai — Research-focused EN → BN Translator</span></div>
+              <div class="card-body">
+                <div class="fb-chip-row" style="margin-bottom:10px;">
+                  <span class="fb-chip fb-chip-blue">NLLB-200</span>
+                  <span class="fb-chip fb-chip-blue">PyTorch</span>
+                  <span class="fb-chip fb-chip-blue">Hugging Face</span>
+                  <span class="fb-chip fb-chip-blue">LoRA / QLoRA</span>
+                </div>
+                <p style="font-size:13px; color:var(--text-secondary); line-height:1.7;">Goal: stop "robotic" translations. Fine-tuning NLLB with 20k custom pairs to capture natural Cholitobhasha and proper context (Apni / Tumi / Tui).</p>
+                <ul class="fb-bullets">
+                  <li>Avoids overfitting via 6–7 sentence variations per pair</li>
+                  <li>Focuses on idiomatic fluency for native speakers</li>
+                </ul>
+                <a class="fb-link-btn fb-link-btn-sm" href="${L.projects.onubad}" target="_blank" rel="noopener"><i data-lucide="code-2" size="13"></i> Repo</a>
+              </div>
+            </div>
+
+            <div class="card fb-post">
+              <div class="card-header"><span>📚 AI AskBook — Open Library for High-Quality AI Prompts</span></div>
+              <div class="card-body">
+                <div class="fb-chip-row" style="margin-bottom:10px;">
+                  <span class="fb-chip fb-chip-purple">Django</span>
+                  <span class="fb-chip fb-chip-purple">Jinja2</span>
+                  <span class="fb-chip fb-chip-purple">PostgreSQL</span>
+                  <span class="fb-chip fb-chip-purple">Render</span>
+                </div>
+                <p style="font-size:13px; color:var(--text-secondary); line-height:1.7;">Goal: solves the "blank screen" problem — instead of fighting with ChatGPT/Claude, use battle-tested prompts from a global hive-mind.</p>
+                <ul class="fb-bullets">
+                  <li>Templates ranked by real-world success</li>
+                  <li>Skips the trial-and-error cycle, saving hours</li>
+                  <li>Built to get master-level outputs instantly</li>
+                </ul>
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                  <a class="fb-link-btn fb-link-btn-sm" href="${L.projects.askbookRepo}" target="_blank" rel="noopener"><i data-lucide="code-2" size="13"></i> Repo</a>
+                  <a class="fb-link-btn fb-link-btn-sm" href="${L.projects.askbookLive}" target="_blank" rel="noopener"><i data-lucide="external-link" size="13"></i> Live</a>
+                </div>
+              </div>
+            </div>
+
+            <div class="card fb-post">
+              <div class="card-header"><span>📄 PDF Insights — Smart PDF Analyzer with OCR &amp; Semantic Search</span></div>
+              <div class="card-body">
+                <div class="fb-chip-row" style="margin-bottom:10px;">
+                  <span class="fb-chip fb-chip-green">React</span>
+                  <span class="fb-chip fb-chip-green">Flask</span>
+                  <span class="fb-chip fb-chip-green">SentenceTransformers</span>
+                  <span class="fb-chip fb-chip-green">FAISS</span>
+                  <span class="fb-chip fb-chip-green">Tesseract</span>
+                  <span class="fb-chip fb-chip-green">Pix2Tex</span>
+                </div>
+                <p style="font-size:13px; color:var(--text-secondary); line-height:1.7;">Goal: most PDF tools only search keywords — this one understands meaning. Search "deep learning," find "neural networks."</p>
+                <ul class="fb-bullets">
+                  <li>Semantic search via vector embeddings</li>
+                  <li>Detects equations, converts to LaTeX</li>
+                  <li>OCR for scanned books standard readers can't index</li>
+                  <li>Shows OCR confidence &amp; processing metrics</li>
+                </ul>
+                <a class="fb-link-btn fb-link-btn-sm" href="${L.projects.pdfInsights}" target="_blank" rel="noopener"><i data-lucide="code-2" size="13"></i> Repo</a>
+              </div>
+            </div>
+
+            <div style="text-align:center; margin-top:8px;">
+              <a class="fb-link-btn" href="${L.projects.viewMore}" target="_blank" rel="noopener"><i data-lucide="package" size="15"></i> View More Projects</a>
+            </div>
+          </div>
+
+          <!-- EDUCATION -->
+          <div class="fb-panel" data-devtab="education" style="display:none;">
+            <div class="card fb-post">
+              <div class="card-header">Education</div>
+              <div class="card-body">
+                <div style="display:flex; gap:14px; align-items:flex-start;">
+                  <div style="width:40px; height:40px; border-radius:8px; background:var(--bg-muted); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                    <i data-lucide="graduation-cap" size="20" style="color:var(--accent);"></i>
+                  </div>
+                  <div>
+                    <div style="font-weight:700; font-size:14px;">BSc. (Engg) in Software Engineering</div>
+                    <div style="font-size:12.5px; color:var(--text-secondary); margin-top:2px;">University of Frontier Technology, Bangladesh</div>
+                    <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">2024 – 2029 (Expected)</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+
         // ── PROFILE HANDLERS ──────────────────────────────────────────
         function attachProfileHandlers() {
           // Save button
@@ -5761,7 +6138,7 @@ ${main}
           navigate, renderSidebar, toggleMobileSidebar, closeMobileSidebar,
           toggleMobilePreview, switchProfileTab, switchProjectTab, switchPdataTab,
           addEntry, deleteEntry, templateThumb,
-          renderProjectView, renderDevDocs
+          renderProjectView, renderDevDocs, switchDevInfoTab,
         };
       })();
 
