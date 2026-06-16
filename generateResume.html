@@ -814,6 +814,13 @@
         padding: 8px;
       }
 
+      .template-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+
       .template-info {
         padding: 12px;
         border-top: 1px solid var(--border);
@@ -1495,7 +1502,7 @@
           <div style="font-size: 11px; color: var(--text-muted)">
             <strong style="color: var(--text-secondary)">ResumeForge</strong>
             v1.0<br />
-            a FORGE OF CREATION by IRSHAD HOSSAIN
+            IRSHAD HOSSAIN
           </div>
         </div>
       </aside>
@@ -1927,7 +1934,7 @@
            id:          string  — unique slug, e.g. "my-template"
            name:        string  — display name
            description: string  — short description
-           thumbnail:   string  — inline SVG or data URI for preview thumb
+           thumbnail:   string  — image URL (or data URI) shown in the picker card
            targetAudience: string — who it's for
            defaultSectionOrder: string[] — preferred section order
 
@@ -2058,6 +2065,9 @@ TemplateRegistry.register({
 
   // Who should use this template
   targetAudience: 'Freshers · Software Engineers · Researchers',
+
+  // Image shown in the template picker. Replace with your own hosted image link.
+  thumbnail: 'https://raw.githubusercontent.com/Irshad-11/Documents/1dbe9ef619323aac29d5cfca895c24e10e96447a/image.png',
 
   // Section order matching the wireframe
   defaultSectionOrder: [
@@ -2516,6 +2526,9 @@ TemplateRegistry.register({
   name: '2 Column (25/75)',
   description: 'Narrow left sidebar with skills/certs, wide right column for experience. Ideal for tech professionals.',
   targetAudience: 'Backend · ML · Senior Engineers',
+
+  // Image shown in the template picker. Replace with your own hosted image link.
+  thumbnail: 'https://raw.githubusercontent.com/Irshad-11/Documents/218170840ee7a5add8c305fc73af634ac89b76e7/Screenshot%20from%202026-06-16%2016-48-44.png',
 
   // ── DEFAULT SECTION ORDER ─────────────────────────────────────
   // Left sidebar sections: skills, certifications, research, languages
@@ -3109,6 +3122,9 @@ ${rightCol || '% (no main column sections with data)'}
         description: 'Clean single-column layout. Perfect for ATS systems, freshers, and corporate applications.',
         targetAudience: 'Freshers · Internships · Corporate',
 
+        // Image shown in the template picker. Replace with your own hosted image link.
+        thumbnail: 'https://raw.githubusercontent.com/Irshad-11/Documents/43fc8d246694ffaf2a884549399d28adb0ee5293/Screenshot%20from%202026-06-16%2016-53-29.png',
+
         defaultSectionOrder: ['summary', 'experience', 'education', 'projects', 'skills', 'certifications', 'awards', 'languages', 'research', 'publications', 'leadership', 'volunteering', 'references'],
 
         // ── TEMPLATE VARIABLE MAP ──────────────────────────────────────
@@ -3436,6 +3452,9 @@ ${rightCol || '% (no main column sections with data)'}
         description: 'Two-column layout with better information density. Ideal for experienced professionals.',
         targetAudience: 'Experienced · Software Engineers · Tech',
 
+        // Image shown in the template picker. Replace with your own hosted image link.
+        thumbnail: 'https://raw.githubusercontent.com/Irshad-11/Documents/refs/heads/main/Screenshot%20from%202026-06-16%2017-00-29.png',
+
         defaultSectionOrder: ['summary', 'experience', 'projects', 'education', 'skills', 'certifications', 'awards', 'research', 'languages', 'leadership', 'volunteering'],
 
         variableMap: {
@@ -3684,6 +3703,9 @@ TemplateRegistry.register({
   name: '2 Column 25/75',
   description: 'Two-column layout with a narrow left sidebar for skills/links and a wide main column for experience and projects. Clean navy + royal-blue accent, ATS-friendly.',
   targetAudience: 'Backend · ML · Software Engineers · Mid-level to Senior',
+
+  // Image shown in the template picker. Replace with your own hosted image link.
+  thumbnail: 'https://raw.githubusercontent.com/Irshad-11/Documents/refs/heads/main/Screenshot%20from%202026-06-16%2017-02-53.png',
 
   defaultSectionOrder: [
     'summary', 'experience', 'projects',
@@ -5116,39 +5138,18 @@ ${main}
         }
 
         function templateThumb(id) {
-          if (id === 'ats-classic') {
-            return `<div style="width:100%; font-size:5px; font-family:serif; line-height:1.4; padding:4px;">
-              <div style="text-align:center; font-weight:bold; font-size:8px; border-bottom:1px solid #1A3A5C; padding-bottom:2px; margin-bottom:3px;">FULL NAME</div>
-              <div style="font-size:6px; font-weight:bold; border-bottom:1px solid #2E6DA4; margin-bottom:2px;">SUMMARY</div>
-              <div style="background:#eee; height:8px; margin-bottom:3px; border-radius:1px;"></div>
-              <div style="font-size:6px; font-weight:bold; border-bottom:1px solid #2E6DA4; margin-bottom:2px;">EXPERIENCE</div>
-              <div style="background:#eee; height:16px; margin-bottom:3px; border-radius:1px;"></div>
-              <div style="font-size:6px; font-weight:bold; border-bottom:1px solid #2E6DA4; margin-bottom:2px;">EDUCATION</div>
-              <div style="background:#eee; height:8px; margin-bottom:3px; border-radius:1px;"></div>
-              <div style="font-size:6px; font-weight:bold; border-bottom:1px solid #2E6DA4; margin-bottom:2px;">SKILLS</div>
-              <div style="background:#eee; height:10px; border-radius:1px;"></div>
-            </div>`;
+          const t = TemplateRegistry.get(id);
+          const fallbackIcon = `<i data-lucide="file-text" size="40" style="color:var(--text-muted);"></i>`;
+          if (t && t.thumbnail) {
+            // Renders the image you set on the template's `thumbnail` field.
+            // If the link is broken/missing, it swaps to the file-text icon automatically.
+            return `<img src="${he(t.thumbnail)}" alt="${he(t.name || id)} preview"
+                       onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                     <div style="display:none; width:100%; height:100%; align-items:center; justify-content:center;">
+                       ${fallbackIcon}
+                     </div>`;
           }
-          if (id === 'modern-ats') {
-            return `<div style="width:100%; font-size:5px; font-family:serif; line-height:1.4; padding:4px;">
-              <div style="text-align:center; font-weight:bold; font-size:8px; border-bottom:1px solid #2E6DA4; padding-bottom:2px; margin-bottom:3px;">FULL NAME</div>
-              <div style="display:grid; grid-template-columns:62% 38%; gap:3px;">
-                <div>
-                  <div style="font-size:5px; font-weight:bold; border-bottom:1px solid #2E6DA4; margin-bottom:2px;">EXPERIENCE</div>
-                  <div style="background:#eee; height:14px; margin-bottom:2px; border-radius:1px;"></div>
-                  <div style="font-size:5px; font-weight:bold; border-bottom:1px solid #2E6DA4; margin-bottom:2px;">PROJECTS</div>
-                  <div style="background:#eee; height:10px; border-radius:1px;"></div>
-                </div>
-                <div>
-                  <div style="font-size:5px; font-weight:bold; border-bottom:1px solid #2E6DA4; margin-bottom:2px;">SKILLS</div>
-                  <div style="background:#eee; height:10px; margin-bottom:2px; border-radius:1px;"></div>
-                  <div style="font-size:5px; font-weight:bold; border-bottom:1px solid #2E6DA4; margin-bottom:2px;">AWARDS</div>
-                  <div style="background:#eee; height:8px; border-radius:1px;"></div>
-                </div>
-              </div>
-            </div>`;
-          }
-          return `<i data-lucide="file-text" size="40" style="color:var(--text-muted);"></i>`;
+          return fallbackIcon;
         }
 
 
