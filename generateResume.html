@@ -2625,6 +2625,434 @@ ${body}
   }
 });
 
+
+TemplateRegistry.register({
+
+  id: 'asymmetric-pro',
+  name: 'Asymmetric Pro',
+  description: 'Two-column layout: 60% main content left, 35% sidebar right. Deep Slate Blue headers, Teal accents.',
+  targetAudience: 'Software Engineers · CS Students · Professionals',
+  thumbnail: 'https://raw.githubusercontent.com/Irshad-11/Documents/refs/heads/main/Asymmetric_Pro_Resume_Template.png',
+
+  defaultSectionOrder: [
+    'summary', 'experience', 'projects',
+    'skills', 'education', 'certifications', 'awards'
+  ],
+
+  variableMap: {
+    NAME:            "data.firstName + ' ' + data.lastName",
+    TITLE:           "data.professionalTitle",
+    TARGET:          "data.targetRole",
+    EMAIL:           "data.email",
+    PHONE:           "data.phone",
+    LINKEDIN:        "data.linkedin",
+    GITHUB:          "data.github",
+    ADDRESS:         "data.city + ', ' + data.country",
+    SUMMARY:         "data.summary",
+    EXPERIENCE:      "data.experience[]",
+    PROJECTS:        "data.projects[]",
+    SKILLS:          "data.skills.*",
+    EDUCATION:       "data.education[]",
+    CERTIFICATIONS:  "data.certifications[]",
+    AWARDS:          "data.awards[]",
+  },
+
+  // ════════════════════════════════════════════════════════════════════════════
+  // LaTeX GENERATOR
+  // ════════════════════════════════════════════════════════════════════════════
+  latexGenerator(data, sections, hiddenSections) {
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // SPACING CONSTANTS — tune these if content overflows or looks too sparse.
+    // Tested at 10pt with ~3 projects + summary + full sidebar = 1 page exactly.
+    // ─────────────────────────────────────────────────────────────────────────
+    const FONT_SIZE       = '10pt';          // 10pt fits dense resumes; use 11pt if sparse
+    const MARGIN          = '0.55in';        // left/right margin
+    const MARGIN_TOP      = '0.5in';         // top margin
+    const MARGIN_BOTTOM   = '0.5in';         // bottom margin
+    const SEC_BEFORE      = '8pt';           // space BEFORE each section heading
+    const SEC_AFTER       = '4pt';           // space AFTER each section heading
+    const ITEM_SEP        = '1pt';           // space between bullet items
+    const ITEM_TOP        = '0pt';           // space before first bullet
+    const ENTRY_GAP       = '4pt';           // vspace between experience/project entries
+    const SIDEBAR_ROW_GAP = '2pt';           // vspace between skill rows in sidebar
+    const HEADER_VSPACE   = '0.15cm';        // vspace above/below the header divider rule
+
+    // ── Preamble ──────────────────────────────────────────────────────────────
+    const preamble = `\\documentclass[${FONT_SIZE},a4paper]{article}
+\\usepackage[utf8]{inputenc}
+\\usepackage[left=${MARGIN}, right=${MARGIN}, top=${MARGIN_TOP}, bottom=${MARGIN_BOTTOM}]{geometry}
+\\usepackage{titlesec}
+\\usepackage{enumitem}
+\\usepackage{hyperref}
+\\usepackage{xcolor}
+\\usepackage{fontawesome5}
+\\usepackage{newtxtext,newtxmath}
+\\renewcommand{\\familydefault}{\\rmdefault}
+\\raggedbottom
+\\setlength{\\parskip}{0pt}
+\\setlength{\\parindent}{0pt}
+\\definecolor{primaryBrand}{HTML}{1E3A8A}
+\\definecolor{secondaryDark}{HTML}{475569}
+\\definecolor{accentColor}{HTML}{0D9488}
+\\definecolor{dividerGray}{HTML}{CBD5E1}
+\\hypersetup{colorlinks=true, linkcolor=accentColor, urlcolor=accentColor}
+\\titleformat{\\section}{\\normalfont\\large\\bfseries\\color{primaryBrand}\\uppercase}{}{0em}{}[\\vspace{-2pt}\\color{dividerGray}\\hrule height 1pt]
+\\titlespacing*{\\section}{0pt}{${SEC_BEFORE}}{${SEC_AFTER}}
+\\setlist[itemize]{leftmargin=15pt, topsep=${ITEM_TOP}, itemsep=${ITEM_SEP}, parsep=0pt}
+\\pagestyle{empty}
+\\begin{document}`;
+
+    // ── Header ────────────────────────────────────────────────────────────────
+    const fullName  = ltx([data.firstName, data.lastName].filter(Boolean).join(' '));
+    const jobTitle  = data.professionalTitle ? ltx(data.professionalTitle) : '';
+    const targeting = data.targetRole        ? ltx(data.targetRole)        : '';
+
+    const email    = data.email    ? `\\href{mailto:${ltxUrl(data.email)}}{${ltx(data.email)}} \\hspace{2mm} \\textcolor{primaryBrand}{\\faEnvelope}` : '';
+    const linkedin = data.linkedin ? `\\href{${ltxUrl(data.linkedin)}}{${ltx(data.linkedin)}} \\hspace{2mm} \\textcolor{primaryBrand}{\\faLinkedin}` : '';
+    const github   = data.github   ? `\\href{${ltxUrl(data.github)}}{${ltx(data.github)}} \\hspace{2mm} \\textcolor{primaryBrand}{\\faGithub}` : '';
+    const location = (data.city || data.country)
+      ? `${ltx([data.city, data.country].filter(Boolean).join(', '))} \\hspace{2mm} \\textcolor{primaryBrand}{\\faMapMarkerAlt}` : '';
+    const phone    = data.phone ? `${ltx(data.phone)} \\hspace{2mm} \\textcolor{primaryBrand}{\\faPhone}` : '';
+
+    const rightLines = [email, linkedin, github, location, phone].filter(Boolean).join(' \\\\\n    ');
+
+    let headerLeft = `{\\Huge \\textbf{\\color{primaryBrand} ${fullName}}} \\\\[6pt]\n`;
+    if (jobTitle)  headerLeft += `  {\\large \\textit{\\color{secondaryDark} ${jobTitle}}} \\\\[4pt]\n`;
+    if (targeting) headerLeft += `  \\textbf{Targeting:} ${targeting}\n`;
+
+    const headerRight = rightLines ? `  \\raggedleft\n  \\small\n  ${rightLines} \\\\` : '';
+
+    // CRITICAL: no blank lines between minipages — blank line = paragraph break = page 2
+    // CRITICAL: \vspace%\noindent% — the % eats the newline so no paragraph gap before body
+    const header = `\\noindent%
+\\begin{minipage}[b]{0.60\\textwidth}
+  ${headerLeft}\\end{minipage}%
+\\hfill%
+\\begin{minipage}[b]{0.38\\textwidth}
+${headerRight}
+\\end{minipage}
+\\vspace{${HEADER_VSPACE}}
+{\\color{primaryBrand}\\hrule height 1.5pt}
+\\vspace{${HEADER_VSPACE}}%`;
+
+    // ── Helpers ───────────────────────────────────────────────────────────────
+    function sidebarSec(iconCmd, title) {
+      return `\\section{\\makebox[0pt][l]{\\hspace{-12pt}\\textcolor{accentColor}{\\small${iconCmd}}}\\hspace{6pt}${ltx(title)}}`;
+    }
+
+    function bulletBlock(text) {
+      if (!text) return '';
+      return `\\begin{itemize}\n${ltxItems(text)}\n\\end{itemize}\n`;
+    }
+
+    // ── Build left and right column content ───────────────────────────────────
+    const LEFT_SECS  = new Set(['summary', 'experience', 'projects']);
+    const RIGHT_SECS = new Set(['skills', 'education', 'certifications', 'awards']);
+
+    let leftBody  = '';
+    let rightBody = '';
+
+    for (const sec of sections) {
+      if (hiddenSections.includes(sec)) continue;
+
+      // ── Summary ──────────────────────────────────────────────────────────────
+      if (sec === 'summary' && data.summary && LEFT_SECS.has(sec)) {
+        leftBody += `\\section{Professional Summary}\n${ltx(data.summary)}\n`;
+      }
+
+      // ── Experience ───────────────────────────────────────────────────────────
+      if (sec === 'experience' && data.experience && data.experience.length && LEFT_SECS.has(sec)) {
+        leftBody += `\\section{Professional Experience}\n`;
+        data.experience.forEach((exp, i) => {
+          if (i > 0) leftBody += `\\vspace{${ENTRY_GAP}}\n`;
+          const loc = [exp.city, exp.country].filter(Boolean).join(', ') || 'Remote';
+          leftBody += `\\textbf{${ltx(exp.company || '')}} \\hfill \\textbf{${ltx(loc)}} \\\\\n`;
+          leftBody += `\\textit{${ltx(exp.role || '')}} \\hfill \\textcolor{accentColor}{\\textbf{${ltxDate(exp.startDate, exp.endDate)}}}\n`;
+          const bullets = [exp.responsibilities, exp.achievements].filter(Boolean).join('\n');
+          if (bullets) leftBody += bulletBlock(bullets);
+        });
+      }
+
+      // ── Projects ─────────────────────────────────────────────────────────────
+      if (sec === 'projects' && data.projects && data.projects.length && LEFT_SECS.has(sec)) {
+        leftBody += `\\section{Technical Projects}\n`;
+        data.projects.forEach((proj, i) => {
+          if (i > 0) leftBody += `\\vspace{${ENTRY_GAP}}\n`;
+          const linkPart = proj.github
+            ? ` \\hfill \\href{${ltxUrl(proj.github)}}{\\textcolor{accentColor}{[\\faExternalLinkAlt\\hspace{1pt} Link]}}` : '';
+          leftBody += `\\textbf{${ltx(proj.name || '')}} \\hfill \\textit{${ltx(proj.techStack || '')}} \\\\\n`;
+          leftBody += `\\textit{${ltx(proj.liveLink || 'Personal Project')}}${linkPart}\n`;
+          if (proj.description) leftBody += bulletBlock(proj.description);
+        });
+      }
+
+      // ── Skills ───────────────────────────────────────────────────────────────
+      if (sec === 'skills' && RIGHT_SECS.has(sec)) {
+        const sk = data.skills || {};
+        const rows = [
+          ['Programming Languages',    sk.programming],
+          ['Frameworks \\& Libraries', sk.frameworks],
+          ['Tools \\& Infrastructure', sk.tools],
+          ['Databases',                sk.databases],
+          ['Cloud',                    sk.cloud],
+          ['DevOps',                   sk.devops],
+          ['Languages',                sk.languages],
+          ['Soft Skills',              sk.softSkills],
+          ['Other',                    sk.other],
+        ].filter(([, v]) => v && v.trim());
+
+        if (rows.length) {
+          rightBody += `${sidebarSec('\\faCogs', 'Technical Skills')}\n`;
+          rows.forEach(([label, val]) => {
+            rightBody += `\\textbf{${label}} \\\\\n{\\small ${ltx(val)}}\n\\vspace{${SIDEBAR_ROW_GAP}}\n`;
+          });
+        }
+      }
+
+      // ── Education ────────────────────────────────────────────────────────────
+      if (sec === 'education' && data.education && data.education.length && RIGHT_SECS.has(sec)) {
+        rightBody += `${sidebarSec('\\faGraduationCap', 'Education')}\n`;
+        data.education.forEach(edu => {
+          const deg = [edu.degree, edu.major].filter(Boolean).join(' in ');
+          rightBody += `\\textbf{${ltx(deg)}} \\\\\n`;
+          rightBody += `\\textit{${ltx(edu.institution || '')}} \\\\\n`;
+          rightBody += `\\textcolor{accentColor}{\\textbf{${ltxDate(edu.startDate, edu.endDate)}}} \\\\\n`;
+          if (edu.gpa) rightBody += `{\\small Cumulative GPA: ${ltx(edu.gpa)} / 4.00}\n`;
+          if (edu.description) {
+            rightBody += `\\vspace{${SIDEBAR_ROW_GAP}}\\textbf{Relevant Coursework:}\n{\\small\n\\begin{itemize}[leftmargin=10pt, itemsep=1pt]\n`;
+            edu.description.split('\n').filter(Boolean).forEach(line => {
+              rightBody += `  \\item ${ltx(line)}\n`;
+            });
+            rightBody += `\\end{itemize}\n}\n`;
+          }
+          rightBody += `\\vspace{${SIDEBAR_ROW_GAP}}\n`;
+        });
+      }
+
+      // ── Certifications ───────────────────────────────────────────────────────
+      if (sec === 'certifications' && data.certifications && data.certifications.length && RIGHT_SECS.has(sec)) {
+        rightBody += `${sidebarSec('\\faCertificate', 'Certifications')}\n`;
+        rightBody += `\\begin{itemize}[leftmargin=10pt, itemsep=2pt]\n`;
+        data.certifications.forEach(cert => {
+          let line = `\\textbf{${ltx(cert.title || '')}}`;
+          if (cert.issuer) line += ` (${ltx(cert.issuer)})`;
+          if (cert.date)   line += ` \\hfill ${ltx(cert.date)}`;
+          if (cert.credentialUrl)
+            line += ` [\\href{${ltxUrl(cert.credentialUrl)}}{\\textcolor{accentColor}{Verify}}]`;
+          rightBody += `  \\item ${line}\n`;
+        });
+        rightBody += `\\end{itemize}\n`;
+      }
+
+      // ── Awards ───────────────────────────────────────────────────────────────
+      if (sec === 'awards' && data.awards && data.awards.length && RIGHT_SECS.has(sec)) {
+        rightBody += `${sidebarSec('\\faTrophy', 'Achievements')}\n`;
+        rightBody += `\\begin{itemize}[leftmargin=10pt, itemsep=2pt]\n`;
+        data.awards.forEach(aw => {
+          let line = `\\textbf{${ltx(aw.award || '')}}`;
+          if (aw.organization) line += ` -- ${ltx(aw.organization)}`;
+          if (aw.date)         line += ` \\hfill ${ltx(aw.date)}`;
+          if (aw.description)  line += `\\\\\n    {\\small ${ltx(aw.description)}}`;
+          rightBody += `  \\item ${line}\n`;
+        });
+        rightBody += `\\end{itemize}\n`;
+      }
+    }
+
+    // ── Assemble — CRITICAL: no blank lines anywhere in this block ────────────
+    // The \vspace{..}% at end of header and \noindent% at start of body
+    // must be on consecutive lines with NO blank line between them.
+    // A blank line here = paragraph break = entire body pushed to page 2.
+    const body = `\\noindent%
+\\begin{minipage}[t]{0.60\\textwidth}
+${leftBody}\\end{minipage}%
+\\hfill%
+\\begin{minipage}[t]{0.35\\textwidth}
+${rightBody}\\end{minipage}`;
+
+    // Single \n between header and body (not \n\n) — preserves the % trick above
+    return `${preamble}\n\n${header}\n${body}\n\n\\end{document}\n`;
+  },
+
+  // ════════════════════════════════════════════════════════════════════════════
+  // PREVIEW GENERATOR
+  // ════════════════════════════════════════════════════════════════════════════
+  previewGenerator(data, sections, hiddenSections) {
+
+    const safe = (v) => he(String(v || ''));
+
+    const style = `
+<style>
+  .ap-wrap         { font-family: 'Georgia', serif; font-size: 11px; color: #1a1a1a; padding: 16px 18px; line-height: 1.5; box-sizing: border-box; }
+  .ap-header       { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 6px; }
+  .ap-header-left  { flex: 0 0 60%; }
+  .ap-name         { font-size: 22px; font-weight: 700; color: #1E3A8A; letter-spacing: 0.02em; }
+  .ap-subtitle     { font-size: 12px; font-style: italic; color: #475569; margin: 3px 0; }
+  .ap-targeting    { font-size: 10px; color: #1a1a1a; }
+  .ap-header-right { flex: 0 0 38%; text-align: right; font-size: 9.5px; color: #475569; line-height: 1.9; }
+  .ap-header-right a { color: #0D9488; text-decoration: none; }
+  .ap-divider-main { border: none; border-top: 2px solid #1E3A8A; margin: 6px 0 10px; }
+  .ap-body         { display: flex; gap: 16px; }
+  .ap-left         { flex: 0 0 60%; }
+  .ap-right        { flex: 0 0 36%; }
+  .ap-sec-head     { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #1E3A8A; border-bottom: 1px solid #CBD5E1; padding-bottom: 2px; margin: 12px 0 5px; }
+  .ap-entry        { margin-bottom: 8px; }
+  .ap-row          { display: flex; justify-content: space-between; align-items: baseline; }
+  .ap-company      { font-weight: 700; font-size: 10.5px; }
+  .ap-loc          { font-size: 9.5px; font-weight: 700; }
+  .ap-role         { font-style: italic; font-size: 10px; color: #333; }
+  .ap-date         { font-size: 9.5px; color: #0D9488; font-weight: 700; }
+  .ap-bullets      { margin: 3px 0 0 14px; padding: 0; font-size: 9.5px; color: #333; }
+  .ap-bullets li   { margin-bottom: 2px; }
+  .ap-sk-label     { font-weight: 700; font-size: 10px; margin-top: 5px; }
+  .ap-sk-val       { font-size: 9.5px; color: #333; }
+  .ap-edu-deg      { font-weight: 700; font-size: 10.5px; }
+  .ap-edu-inst     { font-style: italic; font-size: 10px; color: #333; }
+  .ap-edu-date     { font-size: 9.5px; color: #0D9488; font-weight: 700; }
+  .ap-list         { margin: 3px 0 0 12px; padding: 0; font-size: 9.5px; color: #333; }
+  .ap-list li      { margin-bottom: 2px; }
+  .ap-verify       { font-size: 9px; color: #0D9488; margin-left: 4px; }
+</style>`;
+
+    const fullName = [data.firstName, data.lastName].filter(Boolean).join(' ');
+    const contactItems = [
+      data.email    ? `<a href="mailto:${safe(data.email)}">${safe(data.email)}</a> ✉` : null,
+      data.linkedin ? `<a href="${safe(data.linkedin)}" target="_blank">LinkedIn</a> 🔗` : null,
+      data.github   ? `<a href="${safe(data.github)}" target="_blank">GitHub</a> 🔗` : null,
+      (data.city || data.country) ? `${safe([data.city, data.country].filter(Boolean).join(', '))} 📍` : null,
+      data.phone ? `${safe(data.phone)} 📞` : null,
+    ].filter(Boolean);
+
+    let html = style + `<div class="ap-wrap">`;
+    html += `<div class="ap-header"><div class="ap-header-left">`;
+    html += `<div class="ap-name">${safe(fullName)}</div>`;
+    if (data.professionalTitle) html += `<div class="ap-subtitle">${safe(data.professionalTitle)}</div>`;
+    if (data.targetRole)        html += `<div class="ap-targeting"><strong>Targeting:</strong> ${safe(data.targetRole)}</div>`;
+    html += `</div><div class="ap-header-right">${contactItems.join('<br>')}</div></div>`;
+    html += `<hr class="ap-divider-main">`;
+
+    const LEFT_SECS  = new Set(['summary', 'experience', 'projects']);
+    const RIGHT_SECS = new Set(['skills', 'education', 'certifications', 'awards']);
+    let leftHtml = '', rightHtml = '';
+
+    function liItems(text) {
+      return (text || '').split('\n').filter(Boolean).map(l => `<li>${safe(l)}</li>`).join('');
+    }
+
+    for (const sec of sections) {
+      if (hiddenSections.includes(sec)) continue;
+
+      if (sec === 'summary' && data.summary && LEFT_SECS.has(sec)) {
+        leftHtml += `<div class="preview-section" data-section="summary">`;
+        leftHtml += `<div class="ap-sec-head">Professional Summary</div>`;
+        leftHtml += `<div style="font-size:9.5px;color:#333">${safe(data.summary)}</div></div>`;
+      }
+
+      if (sec === 'experience' && data.experience && data.experience.length && LEFT_SECS.has(sec)) {
+        leftHtml += `<div class="preview-section" data-section="experience"><div class="ap-sec-head">Professional Experience</div>`;
+        data.experience.forEach(exp => {
+          const loc     = [exp.city, exp.country].filter(Boolean).join(', ') || 'Remote';
+          const dateStr = [exp.startDate, exp.endDate].filter(Boolean).join(' – ');
+          const bullets = [exp.responsibilities, exp.achievements].filter(Boolean).join('\n');
+          leftHtml += `<div class="ap-entry">`;
+          leftHtml += `<div class="ap-row"><span class="ap-company">${safe(exp.company)}</span><span class="ap-loc">${safe(loc)}</span></div>`;
+          leftHtml += `<div class="ap-row"><span class="ap-role">${safe(exp.role)}</span><span class="ap-date">${safe(dateStr)}</span></div>`;
+          if (bullets) leftHtml += `<ul class="ap-bullets">${liItems(bullets)}</ul>`;
+          leftHtml += `</div>`;
+        });
+        leftHtml += `</div>`;
+      }
+
+      if (sec === 'projects' && data.projects && data.projects.length && LEFT_SECS.has(sec)) {
+        leftHtml += `<div class="preview-section" data-section="projects"><div class="ap-sec-head">Technical Projects</div>`;
+        data.projects.forEach(proj => {
+          const linkHtml = proj.github
+            ? ` <a href="${safe(proj.github)}" target="_blank" style="color:#0D9488;font-size:9px">[↗ Link]</a>` : '';
+          leftHtml += `<div class="ap-entry">`;
+          leftHtml += `<div class="ap-row"><span class="ap-company">${safe(proj.name)}</span><span style="font-size:9.5px;font-style:italic;color:#475569">${safe(proj.techStack || '')}</span></div>`;
+          leftHtml += `<div style="font-size:9px;color:#555">${safe(proj.liveLink || 'Personal Project')}${linkHtml}</div>`;
+          if (proj.description) leftHtml += `<ul class="ap-bullets">${liItems(proj.description)}</ul>`;
+          leftHtml += `</div>`;
+        });
+        leftHtml += `</div>`;
+      }
+
+      if (sec === 'skills' && RIGHT_SECS.has(sec)) {
+        const sk = data.skills || {};
+        const rows = [
+          ['Programming Languages', sk.programming],
+          ['Frameworks & Libraries', sk.frameworks],
+          ['Tools & Infrastructure', sk.tools],
+          ['Databases',             sk.databases],
+          ['Cloud',                 sk.cloud],
+          ['DevOps',                sk.devops],
+          ['Languages',             sk.languages],
+          ['Soft Skills',           sk.softSkills],
+          ['Other',                 sk.other],
+        ].filter(([, v]) => v && v.trim());
+        if (rows.length) {
+          rightHtml += `<div class="preview-section" data-section="skills"><div class="ap-sec-head">⚙ Technical Skills</div>`;
+          rows.forEach(([label, val]) => {
+            rightHtml += `<div class="ap-sk-label">${safe(label)}</div><div class="ap-sk-val">${safe(val)}</div>`;
+          });
+          rightHtml += `</div>`;
+        }
+      }
+
+      if (sec === 'education' && data.education && data.education.length && RIGHT_SECS.has(sec)) {
+        rightHtml += `<div class="preview-section" data-section="education"><div class="ap-sec-head">🎓 Education</div>`;
+        data.education.forEach(edu => {
+          const deg     = [edu.degree, edu.major].filter(Boolean).join(' in ');
+          const dateStr = [edu.startDate, edu.endDate].filter(Boolean).join(' – ');
+          rightHtml += `<div style="margin-bottom:6px">`;
+          rightHtml += `<div class="ap-edu-deg">${safe(deg)}</div>`;
+          rightHtml += `<div class="ap-edu-inst">${safe(edu.institution || '')}</div>`;
+          rightHtml += `<div class="ap-edu-date">${safe(dateStr)}</div>`;
+          if (edu.gpa) rightHtml += `<div style="font-size:9px;color:#555">GPA: ${safe(edu.gpa)} / 4.00</div>`;
+          if (edu.description) {
+            rightHtml += `<div style="font-size:9px;font-weight:700;margin-top:2px">Relevant Coursework:</div>`;
+            rightHtml += `<ul class="ap-list">${liItems(edu.description)}</ul>`;
+          }
+          rightHtml += `</div>`;
+        });
+        rightHtml += `</div>`;
+      }
+
+      if (sec === 'certifications' && data.certifications && data.certifications.length && RIGHT_SECS.has(sec)) {
+        rightHtml += `<div class="preview-section" data-section="certifications"><div class="ap-sec-head">🏅 Certifications</div><ul class="ap-list">`;
+        data.certifications.forEach(cert => {
+          let line = `<strong>${safe(cert.title || '')}</strong>`;
+          if (cert.issuer) line += ` (${safe(cert.issuer)})`;
+          if (cert.date)   line += ` <span style="color:#777">${safe(cert.date)}</span>`;
+          if (cert.credentialUrl)
+            line += ` <a href="${safe(cert.credentialUrl)}" target="_blank" class="ap-verify">[Verify]</a>`;
+          rightHtml += `<li>${line}</li>`;
+        });
+        rightHtml += `</ul></div>`;
+      }
+
+      if (sec === 'awards' && data.awards && data.awards.length && RIGHT_SECS.has(sec)) {
+        rightHtml += `<div class="preview-section" data-section="awards"><div class="ap-sec-head">🏆 Achievements</div><ul class="ap-list">`;
+        data.awards.forEach(aw => {
+          let line = `<strong>${safe(aw.award || '')}</strong>`;
+          if (aw.organization) line += `, ${safe(aw.organization)}`;
+          if (aw.date)         line += ` <span style="float:right;color:#777">${safe(aw.date)}</span>`;
+          if (aw.description)  line += `<br><span style="color:#555;font-style:italic">${safe(aw.description)}</span>`;
+          rightHtml += `<li>${line}</li>`;
+        });
+        rightHtml += `</ul></div>`;
+      }
+    }
+
+    html += `<div class="ap-body"><div class="ap-left">${leftHtml}</div><div class="ap-right">${rightHtml}</div></div>`;
+    html += `</div>`;
+    return html;
+  }
+});
+
+
+
 // ═══════════════════════════════════════════════════════════════
 // RESUMEFORGE PLUG-IN TEMPLATE
 // Name:    Sidebar Pro — ATS Professional
